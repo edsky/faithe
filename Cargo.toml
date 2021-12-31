@@ -1,0 +1,29 @@
+[package]
+name = "radon"
+version = "0.1.0"
+edition = "2021"
+authors = ["sy1ntexx"]
+license = "MIT"
+description = "Memory hacking library. Windows only for now"
+
+[features]
+default = ["win32"]
+win32 = ["windows"]
+
+[dependencies]
+thiserror = "1.0.0"
+
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.28.0"
+features = [
+    'Win32_System_Diagnostics_ToolHelp',
+    'Win32_System_Diagnostics_Debug',
+    'Win32_System_ProcessStatus',
+    'Win32_System_LibraryLoader',
+    'Win32_System_Threading',
+    'Win32_System_Memory',
+    'Win32_System_Kernel',
+    'Win32_Foundation',
+    'Win32_Security',
+]
+optional = true
