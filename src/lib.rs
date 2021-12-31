@@ -19,6 +19,9 @@ pub mod thread;
 /// Pattern searching.
 pub mod pattern;
 
+/// Convenient pointer type.
+pub mod ptr;
+
 /// Re-exports of types used in windows.
 pub mod types;
 
