@@ -12,6 +12,7 @@ use windows::{
 };
 
 /// Represents a single module in a running process.
+#[derive(Debug, Clone)]
 pub struct ModuleEntry {
     /// Id of the process.
     pub process_id: u32,

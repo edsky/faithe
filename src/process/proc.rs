@@ -1,6 +1,6 @@
 use super::Processes;
 use crate::{
-    memory::MemoryBasicInformation, module::Modules, size_of, thread::Threads, RadonError,
+    memory::MemoryBasicInformation, module::Modules, size_of, thread::Threads, RadonError, pattern::{Pattern, PatternSearcher},
 };
 use std::{
     mem::{self, size_of, zeroed},
@@ -95,8 +95,40 @@ impl Process {
         }
     }
 
+    /// Searches for a specific pattern in the process's module.
+    /// Returns `None` if failed to find specified pattern.
+    /// Otherwise returns the address of the first occurence.
+    pub fn find_pattern(&self, mod_name: impl AsRef<str>, pat: Pattern) -> crate::Result<Option<usize>> {
+        self
+            .modules()?
+            .find(|me| me.sz_module == mod_name.as_ref())
+            .ok_or(RadonError::ModuleNotFound)?
+            .find_first_pattern(pat)
+        
+    }
+
+    /// Reads process's memory at address and returns read value.
+    pub fn read_process_memory<T>(&self, address: usize) -> crate::Result<T> {
+        unsafe {
+            let mut buf = zeroed();
+            let mut _read = 0;
+            if ReadProcessMemory(
+                self.0,
+                address as _,
+                &mut buf as *mut T as _,
+                size_of::<T>(),
+                &mut _read,
+            ) == false
+            {
+                Err(RadonError::last_error())
+            } else {
+                Ok(buf)
+            }
+        }
+    }
+
     /// Reads process's memory at address and returns read value and amount of bytes read.
-    pub fn read_process_memory<T>(&self, address: usize) -> crate::Result<(T, usize)> {
+    pub fn read_process_memory_ext<T>(&self, address: usize) -> crate::Result<(T, usize)> {
         unsafe {
             let mut buf = zeroed();
             let mut read = 0;

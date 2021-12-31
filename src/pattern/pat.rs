@@ -1,5 +1,4 @@
 use super::ByteMatch;
-use std::num::ParseIntError;
 
 /// Memory pattern
 #[derive(Debug, Clone)]
@@ -17,48 +16,48 @@ impl Pattern {
 
 impl Pattern {
     /// Parses ida style pattern.
+    /// # Panics
+    /// Panics if pattern of invalid style was supplied.
     /// ```
     /// # use radon::pattern::Pattern;
-    /// let ida_pat = Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D").unwrap();
+    /// let ida_pat = Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D");
     /// ```
-    pub fn from_ida_style(pat: impl AsRef<str>) -> Result<Self, ParseIntError> {
-        pat.as_ref()
-            .split_ascii_whitespace()
-            .map(|s| {
-                if s == "?" {
-                    Ok(ByteMatch::Any)
-                } else {
-                    match u8::from_str_radix(s, 16) {
-                        Ok(b) => Ok(ByteMatch::Exact(b)),
-                        Err(e) => Err(e),
+    pub fn from_ida_style(pat: impl AsRef<str>) -> Self {
+        Self(
+            pat.as_ref()
+                .split_ascii_whitespace()
+                .map(|s| {
+                    if s == "?" {
+                        ByteMatch::Any
+                    } else {
+                        ByteMatch::Exact(u8::from_str_radix(s, 16).expect("Failed to parse the pattern."))
                     }
-                }
-            })
-            .collect::<Result<Vec<ByteMatch>, ParseIntError>>()
-            .map(|m| Self(m))
+                })
+                .collect::<Vec<ByteMatch>>()
+        )
     }
 
     /// Parses PEiD style pattern.
+    /// # Panics
+    /// Panics if pattern of invalid style was supplied.
     /// ```
     /// # use radon::pattern::Pattern;
-    /// let peid_pat = Pattern::from_peid_style("48 89 85 F0 00 00 00 4C 8B ?? ?? ?? ?? ?? 48 8D").unwrap();
+    /// let peid_pat = Pattern::from_peid_style("48 89 85 F0 00 00 00 4C 8B ?? ?? ?? ?? ?? 48 8D");
     /// ```
-    pub fn from_peid_style(pat: impl AsRef<str>) -> Result<Self, ParseIntError> {
-        pat.as_ref()
-            .split_ascii_whitespace()
-            .map(|s| {
-                assert_eq!(s.len(), 2);
-                if s == "??" {
-                    Ok(ByteMatch::Any)
-                } else {
-                    match u8::from_str_radix(s, 16) {
-                        Ok(b) => Ok(ByteMatch::Exact(b)),
-                        Err(e) => Err(e),
+    pub fn from_peid_style(pat: impl AsRef<str>) -> Self {
+        Self(
+            pat.as_ref()
+                .split_ascii_whitespace()
+                .map(|s| {
+                    assert_eq!(s.len(), 2);
+                    if s == "??" {
+                        ByteMatch::Any
+                    } else {
+                        ByteMatch::Exact(u8::from_str_radix(s, 16).expect("Failed to parse the pattern."))
                     }
-                }
-            })
-            .collect::<Result<Vec<ByteMatch>, ParseIntError>>()
-            .map(|m| Self(m))
+                })
+                .collect::<Vec<ByteMatch>>()
+        )
     }
 
     /// Parses code style pattern.

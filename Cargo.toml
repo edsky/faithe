@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 authors = ["sy1ntexx"]
 license = "MIT"
-description = "Memory hacking library. Windows only for now"
+description = "Memory hacking library. Windows only for now."
+readme = "README.md"
+repository = "https://github.com/sy1ntexx/radon"
 
 [features]
 default = ["win32"]

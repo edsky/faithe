@@ -4,8 +4,10 @@ pub enum RadonError {
     /// Error code returned from `GetLastError()` WinAPI.
     #[cfg(feature = "win32")]
     ErrorCode(windows::Win32::Foundation::WIN32_ERROR),
-    /// No processes with selected filters were found.
+    /// No process with selected name were found.
     ProcessNotFound,
+    /// No module with selected name were found.
+    ModuleNotFound
 }
 
 impl RadonError {

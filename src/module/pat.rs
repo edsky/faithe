@@ -1,7 +1,6 @@
 use super::ModuleEntry;
 use crate::{
-    pattern::{Pattern, PatternSearcher},
-    process::Process,
+    pattern::{Pattern, PatternSearcher}, process::Process,
 };
 use windows::Win32::System::Threading::PROCESS_VM_READ;
 
@@ -36,9 +35,12 @@ impl Iterator for ModulePatIter {
             None
         } else {
             loop {
-                self.proc
+                if let Err(_) = self.proc
                     .read_process_memory_buf(self.from, &mut self.buf[..])
-                    .unwrap();
+                {
+                    return None;
+                }
+
                 if self.pat.matches(&self.buf) {
                     break Some(self.from);
                 }

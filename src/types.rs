@@ -37,6 +37,13 @@ pub mod allocation_types {
     };
 }
 
+/// Types of freeing that can be used with [`crate::process::Process::virtual_free`]
+pub mod free_types {
+    pub use windows::Win32::System::Memory::{
+        VIRTUAL_FREE_TYPE, MEM_DECOMMIT, MEM_RELEASE
+    };
+}
+
 /// Page types from [`crate::memory::MemoryBasicInformation`]
 pub mod page_types {
     pub use windows::Win32::System::Memory::{MEM_IMAGE, MEM_MAPPED, MEM_PRIVATE, PAGE_TYPE};
