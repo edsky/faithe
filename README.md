@@ -61,3 +61,25 @@ let address = process.find_pattern(
     Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D")
 )?;
 ```
+
+# Macros
+```rust
+use radon::{interface, xstruct};
+
+struct CEntity;
+
+interface! {
+    trait IEntity {
+        0 @ fn get_health() -> u32;
+        1 @ fn set_health(new_value: u32);
+    }
+    impl for CEntity;
+}
+
+xstruct! {
+    struct CPlayer {
+        0x100 @ health: u32,
+        0x250 @ stamina: f32
+    }
+}
+```
