@@ -4,7 +4,7 @@ Memory hacking library for windows.
 # Instalation
 ```toml
 [dependencies.radon]
-git = "https://github.com/sy1ntexx/radon
+git = "https://github.com/sy1ntexx/radon"
 ```
 
 # Opening processes
