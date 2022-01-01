@@ -35,10 +35,10 @@ value += 100;
 process.write_process_memory(0xFF, value)?;
 ```
 
-# Allocating / Freeing memory
+# Allocating / Freeing / Protecting / Querying memory
 ```rust
+use radon::types::protection_flags::{PAGE_EXECUTE_READWRITE, PAGE_READONLY};
 use radon::types::allocation_types::{MEM_COMMIT, MEM_RESERVE};
-use radon::types::protection_flags::PAGE_EXECUTE_READWRITE;
 use radon::types::free_types::MEM_RELEASE;
 
 let process = get_process();
@@ -48,6 +48,9 @@ let mut chunk = process.virtual_allocate(
     MEM_COMMIT | MEM_RESERVE,
     PAGE_EXECUTE_READWRITE
 )?;
+let info = process.virtual_query(chunk)?;
+
+process.virtual_protect(chunk, 1000, PAGE_READONLY)?;
 process.virtual_free(chunk, 0, MEM_RELEASE)?;
 ```
 
