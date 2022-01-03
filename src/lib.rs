@@ -2,6 +2,7 @@
 //! # Radon
 //! Useful stuff for memory hacking in windows.
 
+#[cfg(feature = "win32")]
 /// APIs for internal interation with current process.
 pub mod internal;
 /// Useful memory APIs.
@@ -18,9 +19,6 @@ pub mod thread;
 
 /// Pattern searching.
 pub mod pattern;
-
-/// Convenient pointer type.
-pub mod ptr;
 
 /// Re-exports of types used in windows.
 pub mod types;
