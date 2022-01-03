@@ -13,6 +13,7 @@ use windows::{
 };
 
 /// Basic information about process's module.
+#[derive(Debug, Clone)]
 pub struct ModuleInfo {
     /// Base of the module.
     pub dll_base: *mut (),

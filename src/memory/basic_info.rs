@@ -3,6 +3,7 @@ use windows::Win32::System::Memory::{
 };
 
 /// Basic information about memory region.
+#[derive(Debug, Clone)]
 pub struct MemoryBasicInformation {
     /// Base address of region.
     pub base_address: usize,

@@ -10,6 +10,7 @@ use windows::{
 };
 
 /// Represents single running thread in a process.
+#[derive(Debug, Clone)]
 pub struct ThreadEntry {
     /// Id of the process this thread is running in.
     pub process_id: u32,
