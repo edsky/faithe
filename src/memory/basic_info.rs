@@ -11,8 +11,6 @@ pub struct MemoryBasicInformation {
     pub alloc_base: usize,
     /// Initial protection of allocated pages.
     pub alloc_protection: PAGE_PROTECTION_FLAGS,
-    /// Idk
-    pub partition_id: u16,
     /// Size of region in bytes.
     pub region_size: usize,
     /// Current state of memory region.
@@ -29,7 +27,6 @@ impl From<MEMORY_BASIC_INFORMATION> for MemoryBasicInformation {
             base_address: v.BaseAddress as _,
             alloc_base: v.AllocationBase as _,
             alloc_protection: v.AllocationProtect as _,
-            partition_id: v.PartitionId,
             region_size: v.RegionSize,
             state: v.State,
             protection: v.Protect,
