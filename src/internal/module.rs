@@ -1,14 +1,11 @@
 use super::get_current_process;
 use crate::{pattern::Pattern, size_of, RadonError};
 use std::mem::zeroed;
-use windows::{
-    core::Handle,
-    Win32::{
-        Foundation::{HINSTANCE, PWSTR},
-        System::{
-            LibraryLoader::GetModuleHandleW,
-            ProcessStatus::{K32GetModuleInformation, MODULEINFO},
-        },
+use windows::Win32::{
+    Foundation::{HINSTANCE, PWSTR},
+    System::{
+        LibraryLoader::GetModuleHandleW,
+        ProcessStatus::{K32GetModuleInformation, MODULEINFO},
     },
 };
 
@@ -39,7 +36,7 @@ pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> 
     unsafe {
         let handle = GetModuleHandleW(PWSTR(utf16.as_mut_ptr()));
 
-        if handle.is_invalid() {
+        if handle == 0 {
             Err(RadonError::last_error())
         } else {
             Ok(handle)

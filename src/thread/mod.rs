@@ -2,7 +2,6 @@ use std::mem::zeroed;
 
 use crate::RadonError;
 use windows::{
-    core::Handle,
     Win32::{
         Foundation::HANDLE,
         System::{

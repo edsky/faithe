@@ -16,13 +16,14 @@ win32 = ["windows"]
 thiserror = "1.0.0"
 
 [target.'cfg(windows)'.dependencies.windows]
-version = "0.28.0"
+version = "0.29.0"
 features = [
     'Win32_System_Diagnostics_ToolHelp',
     'Win32_System_Diagnostics_Debug',
     'Win32_System_ProcessStatus',
     'Win32_System_LibraryLoader',
     'Win32_System_Threading',
+    'Win32_System_Console',
     'Win32_System_Memory',
     'Win32_System_Kernel',
     'Win32_Foundation',

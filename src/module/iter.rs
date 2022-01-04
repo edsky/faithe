@@ -1,7 +1,6 @@
 use crate::RadonError;
 use std::mem::size_of;
 use windows::{
-    core::Handle,
     Win32::{
         Foundation::{HANDLE, HINSTANCE},
         System::Diagnostics::ToolHelp::{

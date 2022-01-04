@@ -1,6 +1,5 @@
 use crate::{size_of, RadonError};
 use windows::{
-    core::Handle,
     Win32::{
         Foundation::HANDLE,
         System::Diagnostics::ToolHelp::{
