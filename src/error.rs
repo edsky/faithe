@@ -7,7 +7,7 @@ pub enum RadonError {
     /// No process with selected name were found.
     ProcessNotFound,
     /// No module with selected name were found.
-    ModuleNotFound
+    ModuleNotFound,
 }
 
 impl RadonError {

@@ -1,10 +1,8 @@
 use crate::{size_of, RadonError};
-use windows::{
-    Win32::{
-        Foundation::HANDLE,
-        System::Diagnostics::ToolHelp::{
-            CreateToolhelp32Snapshot, Thread32First, Thread32Next, TH32CS_SNAPTHREAD, THREADENTRY32,
-        },
+use windows::Win32::{
+    Foundation::HANDLE,
+    System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Thread32First, Thread32Next, TH32CS_SNAPTHREAD, THREADENTRY32,
     },
 };
 

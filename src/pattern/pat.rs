@@ -30,10 +30,12 @@ impl Pattern {
                     if s == "?" {
                         ByteMatch::Any
                     } else {
-                        ByteMatch::Exact(u8::from_str_radix(s, 16).expect("Failed to parse the pattern."))
+                        ByteMatch::Exact(
+                            u8::from_str_radix(s, 16).expect("Failed to parse the pattern."),
+                        )
                     }
                 })
-                .collect::<Vec<ByteMatch>>()
+                .collect::<Vec<ByteMatch>>(),
         )
     }
 
@@ -53,10 +55,12 @@ impl Pattern {
                     if s == "??" {
                         ByteMatch::Any
                     } else {
-                        ByteMatch::Exact(u8::from_str_radix(s, 16).expect("Failed to parse the pattern."))
+                        ByteMatch::Exact(
+                            u8::from_str_radix(s, 16).expect("Failed to parse the pattern."),
+                        )
                     }
                 })
-                .collect::<Vec<ByteMatch>>()
+                .collect::<Vec<ByteMatch>>(),
         )
     }
 

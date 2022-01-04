@@ -1,13 +1,11 @@
 use std::mem::zeroed;
 
 use crate::RadonError;
-use windows::{
-    Win32::{
-        Foundation::HANDLE,
-        System::{
-            Diagnostics::Debug::{GetThreadContext, SetThreadContext},
-            Threading::{OpenThread, ResumeThread, SuspendThread, THREAD_ACCESS_RIGHTS},
-        },
+use windows::Win32::{
+    Foundation::HANDLE,
+    System::{
+        Diagnostics::Debug::{GetThreadContext, SetThreadContext},
+        Threading::{OpenThread, ResumeThread, SuspendThread, THREAD_ACCESS_RIGHTS},
     },
 };
 

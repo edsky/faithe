@@ -1,12 +1,10 @@
 use crate::RadonError;
 use std::mem::size_of;
-use windows::{
-    Win32::{
-        Foundation::{HANDLE, HINSTANCE},
-        System::Diagnostics::ToolHelp::{
-            CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, MODULEENTRY32W,
-            TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32,
-        },
+use windows::Win32::{
+    Foundation::{HANDLE, HINSTANCE},
+    System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, MODULEENTRY32W, TH32CS_SNAPMODULE,
+        TH32CS_SNAPMODULE32,
     },
 };
 

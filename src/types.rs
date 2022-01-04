@@ -1,4 +1,18 @@
-pub use windows::Win32::Foundation::{HANDLE, HINSTANCE};
+pub use windows::Win32::Foundation::{HANDLE, HINSTANCE, HWND};
+
+/// Styles for [`crate::internal::message_box`]
+pub mod messagebox_styles {
+    pub use windows::Win32::UI::WindowsAndMessaging::{
+        MB_ABORTRETRYIGNORE, MB_APPLMODAL, MB_CANCELTRYCONTINUE, MB_DEFAULT_DESKTOP_ONLY,
+        MB_DEFBUTTON1, MB_DEFBUTTON2, MB_DEFBUTTON3, MB_DEFBUTTON4, MB_DEFMASK, MB_HELP,
+        MB_ICONASTERISK, MB_ICONERROR, MB_ICONEXCLAMATION, MB_ICONHAND, MB_ICONINFORMATION,
+        MB_ICONMASK, MB_ICONQUESTION, MB_ICONSTOP, MB_ICONWARNING, MB_MISCMASK, MB_MODEMASK,
+        MB_NOFOCUS, MB_OK, MB_OKCANCEL, MB_RETRYCANCEL, MB_RIGHT, MB_RTLREADING,
+        MB_SERVICE_NOTIFICATION, MB_SERVICE_NOTIFICATION_NT3X, MB_SETFOREGROUND, MB_SYSTEMMODAL,
+        MB_TASKMODAL, MB_TOPMOST, MB_TYPEMASK, MB_USERICON, MB_YESNO, MB_YESNOCANCEL,
+        MESSAGEBOX_STYLE,
+    };
+}
 
 /// Flags that can be used with [`crate::process::Process::open_by_id`], [`crate::process::Process::open_by_name`] and etc.
 pub mod access_rights {
@@ -39,9 +53,7 @@ pub mod allocation_types {
 
 /// Types of freeing that can be used with [`crate::process::Process::virtual_free`]
 pub mod free_types {
-    pub use windows::Win32::System::Memory::{
-        VIRTUAL_FREE_TYPE, MEM_DECOMMIT, MEM_RELEASE
-    };
+    pub use windows::Win32::System::Memory::{MEM_DECOMMIT, MEM_RELEASE, VIRTUAL_FREE_TYPE};
 }
 
 /// Page types from [`crate::memory::MemoryBasicInformation`]

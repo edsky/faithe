@@ -1,23 +1,26 @@
 use super::Processes;
 use crate::{
-    memory::MemoryBasicInformation, module::Modules, size_of, thread::Threads, RadonError, pattern::{Pattern, PatternSearcher},
+    memory::MemoryBasicInformation,
+    module::Modules,
+    pattern::{Pattern, PatternSearcher},
+    size_of,
+    thread::Threads,
+    RadonError,
 };
 use std::{
     mem::{self, size_of, zeroed},
     ptr::null,
 };
-use windows::{
-    Win32::{
-        Foundation::{CloseHandle, HANDLE, PWSTR},
-        System::{
-            Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory},
-            Memory::{
-                VirtualAllocEx, VirtualFreeEx, VirtualProtectEx, VirtualQueryEx,
-                PAGE_PROTECTION_FLAGS, VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
-            },
-            ProcessStatus::K32GetModuleFileNameExW,
-            Threading::{CreateRemoteThread, GetProcessId, OpenProcess, PROCESS_ACCESS_RIGHTS},
+use windows::Win32::{
+    Foundation::{CloseHandle, HANDLE, PWSTR},
+    System::{
+        Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory},
+        Memory::{
+            VirtualAllocEx, VirtualFreeEx, VirtualProtectEx, VirtualQueryEx, PAGE_PROTECTION_FLAGS,
+            VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
         },
+        ProcessStatus::K32GetModuleFileNameExW,
+        Threading::{CreateRemoteThread, GetProcessId, OpenProcess, PROCESS_ACCESS_RIGHTS},
     },
 };
 
@@ -97,13 +100,15 @@ impl Process {
     /// Searches for a specific pattern in the process's module.
     /// Returns `None` if failed to find specified pattern.
     /// Otherwise returns the address of the first occurence.
-    pub fn find_pattern(&self, mod_name: impl AsRef<str>, pat: Pattern) -> crate::Result<Option<usize>> {
-        self
-            .modules()?
+    pub fn find_pattern(
+        &self,
+        mod_name: impl AsRef<str>,
+        pat: Pattern,
+    ) -> crate::Result<Option<usize>> {
+        self.modules()?
             .find(|me| me.sz_module == mod_name.as_ref())
             .ok_or(RadonError::ModuleNotFound)?
             .find_first_pattern(pat)
-        
     }
 
     /// Reads process's memory at address and returns read value.
