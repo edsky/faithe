@@ -32,7 +32,7 @@ impl From<MODULEINFO> for ModuleInfo {
 
 /// Returns a handle to a module.
 pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> {
-    let mut utf16 = mod_name.as_ref().encode_utf16().collect::<Vec<u16>>();
+    let mut utf16 = format!("{}\x00", mod_name.as_ref()).encode_utf16().collect::<Vec<u16>>();
     unsafe {
         let handle = GetModuleHandleW(PWSTR(utf16.as_mut_ptr()));
 
