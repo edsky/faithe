@@ -61,6 +61,7 @@ use radon::pattern::Pattern;
 let process = get_process();
 let address = process.find_pattern(
     "Something.exe",
+    // Available styles: IDA, Code, PiDB
     Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D")
 )?;
 ```
@@ -71,17 +72,27 @@ use radon::{interface, xstruct};
 
 struct CEntity;
 
+// Creates a trait that will emulate behavior of virtual functions in C++.
 interface! {
     trait IEntity {
         0 @ fn get_health() -> u32;
         1 @ fn set_health(new_value: u32);
     }
     impl for CEntity;
+    /*
+    class IEntity {
+        virtual int get_health() = 0;
+        virtual void set_health(int new_value) = 0;
+    };
+    */
 }
 
+// Creates struct with explicitly defined offsets.
 xstruct! {
     struct CPlayer {
+        // health will be availble at offset 0x100
         0x100 @ health: u32,
+        // stamina will be availble at offset 0x100
         0x250 @ stamina: f32
     }
 }

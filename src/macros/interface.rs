@@ -31,6 +31,7 @@ macro_rules! interface {
         trait $name {
             const __NO_OBJ_SAFETY: () = ();
             $(
+                #[allow(non_snake_case)]
                 #[inline(always)]
                 unsafe fn $fn_ident(&self, $($arg_name:$arg_ty,)*) $(-> $ret_ty)? {
                     let vmt = *(self as *const Self as *const *const [extern "C" fn($($arg_name:$arg_ty),*) $(-> $ret_ty)?; $idx + 1]);
