@@ -36,7 +36,7 @@ pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> 
     unsafe {
         let handle = GetModuleHandleW(PWSTR(utf16.as_mut_ptr()));
 
-        if handle == 0 {
+        if handle.is_invalid() {
             Err(RadonError::last_error())
         } else {
             Ok(handle)
