@@ -1,4 +1,5 @@
-pub mod interface;
-pub mod sizeof;
-pub mod strings;
-pub mod xstruct;
+mod interface;
+mod sizeof;
+mod strings;
+mod xstruct;
+pub use xstruct::*;

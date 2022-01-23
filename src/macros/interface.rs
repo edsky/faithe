@@ -16,7 +16,7 @@
 #[macro_export]
 macro_rules! interface {
     (
-        trait $name:ident {
+        $vm:vis trait $name:ident {
             $(
                 $idx:tt @ fn $fn_ident:ident(
                     $(
@@ -28,7 +28,7 @@ macro_rules! interface {
         $(impl for $($impl_target:ty),*;)?
 
     ) => {
-        trait $name {
+        $vm trait $name {
             const __NO_OBJ_SAFETY: () = ();
             $(
                 #[allow(non_snake_case)]

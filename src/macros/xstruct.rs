@@ -1,6 +1,7 @@
-/// **WARNING**: This may(or may not) generate not very effecient assembly.
 /// This macros allows you to generate structure with explicitly defined
 /// field's offsets.
+/// # Warning
+/// This macros might generate ineffecient assembly code.
 /// ```
 /// # use radon::xstruct;
 /// xstruct! {
@@ -13,19 +14,19 @@
 #[macro_export]
 macro_rules! xstruct {
     (
-        struct $name:ident {
+        $vm:vis struct $name:ident {
             $(
-                $offset:tt @ $field_name:ident: $field_ty:ty
+                $offset:tt @ $flvm:vis $field_name:ident: $field_ty:ty
             ),*
         }
     ) => {
-        struct $name;
+        $vm struct $name;
         impl $name {
             $(
                 #[allow(non_snake_case)]
                 #[inline(always)]
-                pub fn $field_name(&self) -> $field_ty {
-                    unsafe { *((self as *const Self as usize + $offset) as *const $field_ty) }
+                $flvm fn $field_name(&self) -> &mut $field_ty {
+                    unsafe { $crate::to_mut_ref((self as *const Self as usize + $offset) as _) }
                 }
             )*
         }
