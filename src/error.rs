@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// Error type for all mistakes made in radon.
 #[derive(Debug)]
 pub enum RadonError {
@@ -16,5 +18,13 @@ impl RadonError {
         unsafe { Self::ErrorCode(windows::Win32::Foundation::GetLastError()) }
     }
 }
+
+impl Display for RadonError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for RadonError { }
 
 pub(crate) type Result<T> = std::result::Result<T, RadonError>;
