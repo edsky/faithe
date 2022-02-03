@@ -23,6 +23,6 @@ impl Display for RadonError {
     }
 }
 
-impl std::error::Error for RadonError { }
+impl std::error::Error for RadonError {}
 
 pub(crate) type Result<T> = std::result::Result<T, RadonError>;

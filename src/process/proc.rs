@@ -12,7 +12,7 @@ use std::{
     ptr::null,
 };
 use windows::Win32::{
-    Foundation::{CloseHandle, HANDLE, PWSTR, HINSTANCE},
+    Foundation::{CloseHandle, HANDLE, HINSTANCE, PWSTR},
     System::{
         Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory},
         Memory::{
@@ -87,7 +87,8 @@ impl Process {
     pub fn path(&self) -> crate::Result<String> {
         unsafe {
             let mut buf = [0u16; 256];
-            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), PWSTR(&mut buf as _), 256) == 0 {
+            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), PWSTR(&mut buf as _), 256) == 0
+            {
                 Err(RadonError::last_error())
             } else {
                 Ok(String::from_utf16_lossy(
