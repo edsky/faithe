@@ -1,16 +1,15 @@
 [package]
 name = "radon"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["sy1ntexx"]
 license = "MIT"
-description = "Memory hacking library. Windows only for now."
+description = "Windows memory hacking library."
 readme = "README.md"
 repository = "https://github.com/sy1ntexx/radon"
 
 [features]
-default = ["win32"]
-win32 = ["windows"]
+external = []
 
 [dependencies]
 thiserror = "1.0.0"
@@ -30,4 +29,3 @@ features = [
     'Win32_Foundation',
     'Win32_Security',
 ]
-optional = true

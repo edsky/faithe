@@ -2,18 +2,17 @@
 //! # Radon
 //! Useful stuff for memory hacking in windows.
 
-#[cfg(feature = "win32")]
 /// APIs for internal interation with current process.
 pub mod internal;
 /// Useful memory APIs.
 pub mod memory;
-#[cfg(feature = "win32")]
+#[cfg(feature = "external")]
 /// Module for dealing with processs' modules.
 pub mod module;
-#[cfg(feature = "win32")]
+#[cfg(feature = "external")]
 /// Module for doing common things with processes.
 pub mod process;
-#[cfg(feature = "win32")]
+#[cfg(feature = "external")]
 /// Iterator over threads and etc.
 pub mod thread;
 

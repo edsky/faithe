@@ -3,6 +3,7 @@ use windows::Win32::{
     System::{Console, Threading},
     UI::WindowsAndMessaging::{MESSAGEBOX_STYLE, MessageBoxW},
 };
+use crate::RadonError;
 
 /// Returns a handle to the current process.
 pub fn get_current_process() -> HANDLE {
@@ -15,13 +16,21 @@ pub fn get_current_process_id() -> u32 {
 }
 
 /// Allocates console windows ig.
-pub fn alloc_console() -> i32 {
-    unsafe { Console::AllocConsole().0 }
+pub fn alloc_console() -> crate::Result<()> {
+    if unsafe { Console::AllocConsole().0 == 0} {
+        Err(RadonError::last_error())
+    } else {
+        Ok(())
+    }
 }
 
 /// Frees console.
-pub fn free_console() -> i32 {
-    unsafe { Console::FreeConsole().0 }
+pub fn free_console() -> crate::Result<()>  {
+    if unsafe { Console::FreeConsole().0 == 0} {
+        Err(RadonError::last_error())
+    } else {
+        Ok(())
+    }
 }
 
 /// Creates new message box.
@@ -30,13 +39,17 @@ pub fn message_box(
     text: impl AsRef<str>,
     caption: impl AsRef<str>,
     style: MESSAGEBOX_STYLE,
-) -> i32 {
-    unsafe {
+) -> crate::Result<()>  {
+    if unsafe {
         MessageBoxW(
             hwnd,
             PWSTR(format!("{}\x00", text.as_ref()).encode_utf16().collect::<Vec<_>>().as_mut_ptr()),
             PWSTR(format!("{}\x00", caption.as_ref()).encode_utf16().collect::<Vec<_>>().as_mut_ptr()),
             style
-        )
+        ) == 0
+    } {
+        Err(RadonError::last_error())
+    } else {
+        Ok(())
     }
 }

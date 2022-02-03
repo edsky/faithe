@@ -4,7 +4,6 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub enum RadonError {
     /// Error code returned from `GetLastError()` WinAPI.
-    #[cfg(feature = "win32")]
     ErrorCode(windows::Win32::Foundation::WIN32_ERROR),
     /// No process with selected name were found.
     ProcessNotFound,
@@ -13,7 +12,6 @@ pub enum RadonError {
 }
 
 impl RadonError {
-    #[cfg(feature = "win32")]
     pub(crate) fn last_error() -> Self {
         unsafe { Self::ErrorCode(windows::Win32::Foundation::GetLastError()) }
     }
