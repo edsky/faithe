@@ -1,5 +1,6 @@
 /// This macros allows you to generate structure with explicitly defined
-/// field's offsets.
+/// field's offsets. **SHOULD NEVER BE USED AS A MEMBER** because it has zero
+/// size.
 /// # Warning
 /// This macros might generate ineffecient assembly code.
 /// ```

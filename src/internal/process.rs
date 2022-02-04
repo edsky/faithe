@@ -56,7 +56,7 @@ pub fn message_box(
                     .as_mut_ptr(),
             ),
             style,
-        ) == 0
+        ).0 == 0
     } {
         Err(RadonError::last_error())
     } else {
