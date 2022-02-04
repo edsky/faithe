@@ -1,4 +1,4 @@
-use crate::{size_of, RadonError};
+use crate::{size_of, FaitheError};
 use windows::Win32::{
     Foundation::HANDLE,
     System::Diagnostics::ToolHelp::{
@@ -40,7 +40,7 @@ impl Threads {
         unsafe {
             let h_snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id);
             if h_snap.is_invalid() {
-                return Err(RadonError::last_error());
+                return Err(FaitheError::last_error());
             }
 
             let entry = THREADENTRY32 {
@@ -55,7 +55,7 @@ impl Threads {
             };
 
             if Thread32First(h_snap, &mut this.entry) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(this)
             }

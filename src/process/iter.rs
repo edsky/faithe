@@ -1,4 +1,4 @@
-use crate::{module::Modules, thread::Threads, RadonError};
+use crate::{module::Modules, thread::Threads, FaitheError};
 use std::mem::size_of;
 use windows::Win32::{
     Foundation::HANDLE,
@@ -88,7 +88,7 @@ impl Processes {
                 ret: true,
             };
             if Process32FirstW(this.h_snap, &mut this.entry) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(this)
             }

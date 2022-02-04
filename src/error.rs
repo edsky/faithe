@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 /// Error type for all mistakes made in faithe.
 #[derive(Debug)]
-pub enum RadonError {
+pub enum FaitheError {
     /// Error code returned from `GetLastError()` WinAPI.
     ErrorCode(windows::Win32::Foundation::WIN32_ERROR),
     /// No process with selected name were found.
@@ -11,18 +11,18 @@ pub enum RadonError {
     ModuleNotFound,
 }
 
-impl RadonError {
+impl FaitheError {
     pub(crate) fn last_error() -> Self {
         unsafe { Self::ErrorCode(windows::Win32::Foundation::GetLastError()) }
     }
 }
 
-impl Display for RadonError {
+impl Display for FaitheError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
 
-impl std::error::Error for RadonError {}
+impl std::error::Error for FaitheError {}
 
-pub(crate) type Result<T> = std::result::Result<T, RadonError>;
+pub(crate) type Result<T> = std::result::Result<T, FaitheError>;

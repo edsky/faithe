@@ -5,7 +5,7 @@ use crate::{
     pattern::{Pattern, PatternSearcher},
     size_of,
     thread::Threads,
-    RadonError,
+    FaitheError,
 };
 use std::{
     mem::{self, size_of, zeroed},
@@ -37,7 +37,7 @@ impl Process {
         unsafe {
             let handle = OpenProcess(desired_access, inherit_handle, id);
             if handle.is_invalid() {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(Self(handle))
             }
@@ -58,7 +58,7 @@ impl Process {
                     None
                 }
             })
-            .ok_or(RadonError::ProcessNotFound)?
+            .ok_or(FaitheError::ProcessNotFound)?
     }
 
     /// Returns an iterator over all modules in the process.
@@ -89,7 +89,7 @@ impl Process {
             let mut buf = [0u16; 256];
             if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), PWSTR(&mut buf as _), 256) == 0
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(String::from_utf16_lossy(
                     &buf[..buf.iter().position(|b| *b == 0).unwrap_or(0)],
@@ -108,7 +108,7 @@ impl Process {
     ) -> crate::Result<Option<usize>> {
         self.modules()?
             .find(|me| me.sz_module == mod_name.as_ref())
-            .ok_or(RadonError::ModuleNotFound)?
+            .ok_or(FaitheError::ModuleNotFound)?
             .find_first_pattern(pat)
     }
 
@@ -125,7 +125,7 @@ impl Process {
                 &mut _read,
             ) == false
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(buf)
             }
@@ -145,7 +145,7 @@ impl Process {
                 &mut read,
             ) == false
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok((buf, read))
             }
@@ -169,7 +169,7 @@ impl Process {
                 &mut read,
             ) == false
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(read)
             }
@@ -192,7 +192,7 @@ impl Process {
                 &mut written,
             ) == false
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(written)
             }
@@ -216,7 +216,7 @@ impl Process {
                 &mut written,
             ) == false
             {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(written)
             }
@@ -241,7 +241,7 @@ impl Process {
                 new_protection,
                 &mut old
             ) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(old)
             }
@@ -268,7 +268,7 @@ impl Process {
             );
 
             if region.is_null() {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(region as _)
             }
@@ -291,7 +291,7 @@ impl Process {
                 size,
                 free_type
             ) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(())
             }
@@ -303,7 +303,7 @@ impl Process {
         unsafe {
             let mut mem_info = zeroed();
             if VirtualQueryEx(self.0, address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(mem_info.into())
             }
@@ -330,7 +330,7 @@ impl Process {
             );
 
             if handle.is_invalid() {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok((handle, t_id))
             }

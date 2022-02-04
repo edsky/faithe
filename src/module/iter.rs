@@ -1,4 +1,4 @@
-use crate::RadonError;
+use crate::FaitheError;
 use std::mem::size_of;
 use windows::Win32::{
     Foundation::{HANDLE, HINSTANCE},
@@ -57,7 +57,7 @@ impl Modules {
                 CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, process_id);
 
             if h_snap.is_invalid() {
-                return Err(RadonError::last_error());
+                return Err(FaitheError::last_error());
             }
 
             let entry = MODULEENTRY32W {
@@ -72,7 +72,7 @@ impl Modules {
             };
 
             if Module32FirstW(h_snap, &mut this.entry) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(this)
             }

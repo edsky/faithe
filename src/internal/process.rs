@@ -1,4 +1,4 @@
-use crate::RadonError;
+use crate::FaitheError;
 use windows::Win32::{
     Foundation::{HANDLE, HWND, PWSTR},
     System::{Console, Threading},
@@ -18,7 +18,7 @@ pub fn get_current_process_id() -> u32 {
 /// Allocates console windows ig.
 pub fn alloc_console() -> crate::Result<()> {
     if unsafe { Console::AllocConsole().0 == 0 } {
-        Err(RadonError::last_error())
+        Err(FaitheError::last_error())
     } else {
         Ok(())
     }
@@ -27,7 +27,7 @@ pub fn alloc_console() -> crate::Result<()> {
 /// Frees console.
 pub fn free_console() -> crate::Result<()> {
     if unsafe { Console::FreeConsole().0 == 0 } {
-        Err(RadonError::last_error())
+        Err(FaitheError::last_error())
     } else {
         Ok(())
     }
@@ -58,7 +58,7 @@ pub fn message_box(
             style,
         ).0 == 0
     } {
-        Err(RadonError::last_error())
+        Err(FaitheError::last_error())
     } else {
         Ok(())
     }

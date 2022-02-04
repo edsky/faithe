@@ -1,5 +1,5 @@
 use super::get_current_process;
-use crate::{pattern::Pattern, size_of, RadonError};
+use crate::{pattern::Pattern, size_of, FaitheError};
 use std::mem::zeroed;
 use windows::Win32::{
     Foundation::{HINSTANCE, PWSTR},
@@ -39,7 +39,7 @@ pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> 
         let handle = GetModuleHandleW(PWSTR(utf16.as_mut_ptr()));
 
         if handle.is_invalid() {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(handle)
         }
@@ -57,7 +57,7 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
             size_of!(@mod_info) as _,
         ) == false
         {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(mod_info.into())
         }

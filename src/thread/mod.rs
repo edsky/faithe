@@ -1,6 +1,6 @@
 use std::mem::zeroed;
 
-use crate::RadonError;
+use crate::FaitheError;
 use windows::Win32::{
     Foundation::HANDLE,
     System::{
@@ -28,7 +28,7 @@ impl Thread {
             let handle = OpenThread(desired_access, inherit_handle, thread_id);
 
             if handle.is_invalid() {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(Self(handle))
             }
@@ -40,7 +40,7 @@ impl Thread {
     pub fn suspend(&self) -> crate::Result<u32> {
         unsafe {
             match SuspendThread(self.0) {
-                u32::MAX => Err(RadonError::last_error()),
+                u32::MAX => Err(FaitheError::last_error()),
                 sus => Ok(sus),
             }
         }
@@ -51,7 +51,7 @@ impl Thread {
     pub fn resume(&self) -> crate::Result<u32> {
         unsafe {
             match ResumeThread(self.0) {
-                u32::MAX => Err(RadonError::last_error()),
+                u32::MAX => Err(FaitheError::last_error()),
                 sus => Ok(sus),
             }
         }
@@ -63,7 +63,7 @@ impl Thread {
         unsafe {
             let mut ctx = zeroed();
             if GetThreadContext(self.0, &mut ctx) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(ctx)
             }
@@ -75,7 +75,7 @@ impl Thread {
     pub fn set_context(&self, ctx: &CONTEXT) -> crate::Result<()> {
         unsafe {
             if SetThreadContext(self.0, ctx as _) == false {
-                Err(RadonError::last_error())
+                Err(FaitheError::last_error())
             } else {
                 Ok(())
             }

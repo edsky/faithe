@@ -1,4 +1,4 @@
-# Radon
+# Faithe
 Memory hacking library for windows.
 
 # Instalation

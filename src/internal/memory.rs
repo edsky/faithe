@@ -1,4 +1,4 @@
-use crate::{memory::MemoryBasicInformation, size_of, RadonError};
+use crate::{memory::MemoryBasicInformation, size_of, FaitheError};
 use std::mem::zeroed;
 use windows::Win32::System::Memory::{
     VirtualAlloc, VirtualFree, VirtualProtect, VirtualQuery, PAGE_PROTECTION_FLAGS,
@@ -21,7 +21,7 @@ pub fn virtual_protect(
             new_protection,
             &mut old
         ) == false {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(old)
         }
@@ -46,7 +46,7 @@ pub fn virtual_allocate(
         );
 
         if region.is_null() {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(region as _)
         }
@@ -67,7 +67,7 @@ pub fn virtual_free(
             size,
             free_type
         ) == false {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(())
         }
@@ -79,7 +79,7 @@ pub fn virtual_query(address: usize) -> crate::Result<MemoryBasicInformation> {
     unsafe {
         let mut mem_info = zeroed();
         if VirtualQuery(address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {
-            Err(RadonError::last_error())
+            Err(FaitheError::last_error())
         } else {
             Ok(mem_info.into())
         }
