@@ -10,3 +10,11 @@ macro_rules! c_str {
         concat!($($str),*, '\x00')
     };
 }
+
+/// Constructs new zero terminated string of type [`windows::Win32::Foundation::PSTR`].
+#[macro_export]
+macro_rules! pc_str {
+    ($($str:tt),*) => {
+        windows::Win32::Foundation::PSTR(concat!($($str),*, '\x00').as_ptr() as _)
+    };  
+}
