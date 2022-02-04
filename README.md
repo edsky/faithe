@@ -3,6 +3,11 @@ Memory hacking library for windows.
 
 # Instalation
 ```toml
+# Latest version
+[dependencies]
+faithe = "0.3.0"
+
+# Development version
 [dependencies.faithe]
 git = "https://github.com/sy1ntexx/faithe"
 ```

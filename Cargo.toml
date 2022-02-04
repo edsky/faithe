@@ -1,12 +1,16 @@
 [package]
 name = "faithe"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["sy1ntexx"]
 license = "MIT"
 description = "Windows memory hacking library."
 readme = "README.md"
 repository = "https://github.com/sy1ntexx/faithe"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["i686-pc-windows-msvc", "x86_64-pc-windows-msvc"]
 
 [features]
 external = [
