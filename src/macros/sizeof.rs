@@ -1,6 +1,6 @@
 /// Get size in bytes of types and variables.
 /// ```
-/// # use radon::size_of;
+/// # use faithe::size_of;
 /// /// Get's size of the type in bytes.
 /// assert_eq!(size_of!(u32), 4);
 ///

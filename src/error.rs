@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-/// Error type for all mistakes made in radon.
+/// Error type for all mistakes made in faithe.
 #[derive(Debug)]
 pub enum RadonError {
     /// Error code returned from `GetLastError()` WinAPI.

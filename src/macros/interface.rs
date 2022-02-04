@@ -1,7 +1,7 @@
 /// This macro allows you to create a non object safe trait that
 /// allows calling cpp-like virtual methods in classes.
 /// ```
-/// # use radon::interface;
+/// # use faithe::interface;
 /// struct Bar;
 ///
 /// interface! {

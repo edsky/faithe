@@ -19,7 +19,7 @@ impl Pattern {
     /// # Panics
     /// Panics if pattern of invalid style was supplied.
     /// ```
-    /// # use radon::pattern::Pattern;
+    /// # use faithe::pattern::Pattern;
     /// let ida_pat = Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D");
     /// ```
     pub fn from_ida_style(pat: impl AsRef<str>) -> Self {
@@ -43,7 +43,7 @@ impl Pattern {
     /// # Panics
     /// Panics if pattern of invalid style was supplied.
     /// ```
-    /// # use radon::pattern::Pattern;
+    /// # use faithe::pattern::Pattern;
     /// let peid_pat = Pattern::from_peid_style("48 89 85 F0 00 00 00 4C 8B ?? ?? ?? ?? ?? 48 8D");
     /// ```
     pub fn from_peid_style(pat: impl AsRef<str>) -> Self {
@@ -66,7 +66,7 @@ impl Pattern {
 
     /// Parses code style pattern.
     /// ```
-    /// # use radon::pattern::Pattern;
+    /// # use faithe::pattern::Pattern;
     /// let code_pat = Pattern::from_code_style(
     ///     b"\x48\x89\x85\xF0\x00\x00\x00\x4C\x8B\x00\x00\x00\x00\x00\x48\x8D",
     ///     b"xxxxxxxxx?????xx"

@@ -1,12 +1,12 @@
 [package]
-name = "radon"
+name = "faithe"
 version = "0.3.0"
 edition = "2021"
 authors = ["sy1ntexx"]
 license = "MIT"
 description = "Windows memory hacking library."
 readme = "README.md"
-repository = "https://github.com/sy1ntexx/radon"
+repository = "https://github.com/sy1ntexx/faithe"
 
 [features]
 external = [

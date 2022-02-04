@@ -4,7 +4,7 @@
 /// # Warning
 /// This macros might generate ineffecient assembly code.
 /// ```
-/// # use radon::xstruct;
+/// # use faithe::xstruct;
 /// xstruct! {
 ///     struct Bar {
 ///         0x0 @ a: u32,

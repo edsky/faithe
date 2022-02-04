@@ -3,14 +3,14 @@ Memory hacking library for windows.
 
 # Instalation
 ```toml
-[dependencies.radon]
-git = "https://github.com/sy1ntexx/radon"
+[dependencies.faithe]
+git = "https://github.com/sy1ntexx/faithe"
 ```
 
 # Opening processes
 ```rust
-use radon::types::access_rights::PROCESS_ALL_ACCESS;
-use radon::process as ps;
+use faithe::types::access_rights::PROCESS_ALL_ACCESS;
+use faithe::process as ps;
 
 let process = ps::Processes::new()?
     .find(|p| p.sz_exe_file == "Process name.exe")
@@ -37,9 +37,9 @@ process.write_process_memory(0xFF, value)?;
 
 # Allocating / Freeing / Protecting / Querying memory
 ```rust
-use radon::types::protection_flags::{PAGE_EXECUTE_READWRITE, PAGE_READONLY};
-use radon::types::allocation_types::{MEM_COMMIT, MEM_RESERVE};
-use radon::types::free_types::MEM_RELEASE;
+use faithe::types::protection_flags::{PAGE_EXECUTE_READWRITE, PAGE_READONLY};
+use faithe::types::allocation_types::{MEM_COMMIT, MEM_RESERVE};
+use faithe::types::free_types::MEM_RELEASE;
 
 let process = get_process();
 let mut chunk = process.virtual_allocate(
@@ -56,7 +56,7 @@ process.virtual_free(chunk, 0, MEM_RELEASE)?;
 
 # Searching for patterns
 ```rust
-use radon::pattern::Pattern;
+use faithe::pattern::Pattern;
 
 let process = get_process();
 let address = process.find_pattern(
@@ -68,7 +68,7 @@ let address = process.find_pattern(
 
 # Macros
 ```rust
-use radon::{interface, xstruct};
+use faithe::{interface, xstruct};
 
 struct CEntity;
 
