@@ -1,48 +1,45 @@
-/// This macro allows you to create a non object safe trait that
-/// allows calling cpp-like virtual methods in classes.
+/// Creates an trait that emulates virtual table behavior from C++.
 /// ```
 /// # use faithe::interface;
-/// struct Bar;
-///
 /// interface! {
-///     trait Foo {
-///         2 @ fn get_a() -> u32;
-///         3 @ fn set_b(val: u16);
+///     trait IEntity(CPlayer) {
+///         // 1 - is an index of this function in the table.
+///         extern "C" fn print() = 1;
 ///     }
-///     // you also specify structs you want to implement this trait for.
-///     impl for Bar;
 /// }
 /// ```
 #[macro_export]
 macro_rules! interface {
     (
-        $vm:vis trait $name:ident {
-            $(
-                $idx:tt @ fn $fn_ident:ident(
-                    $(
-                        $arg_name:ident: $arg_ty:ty
-                    ),*
-                ) $(-> $ret_ty:ty)?;
-            )*
-        }
-        $(impl for $($impl_target:ty),*;)?
-
-    ) => {
-        $vm trait $name {
-            const __NO_OBJ_SAFETY: () = ();
-            $(
-                #[allow(non_snake_case)]
-                #[inline(always)]
-                unsafe fn $fn_ident(&self, $($arg_name:$arg_ty,)*) $(-> $ret_ty)? {
-                    let vmt = *(self as *const Self as *const *const [extern "C" fn($($arg_name:$arg_ty),*) $(-> $ret_ty)?; $idx + 1]);
-                    (*vmt)[$idx]($($arg_name),*)
-                }
-            )*
-        }
         $(
+            $vs:vis trait $name:ident$(($($target:ident),*))? {
+                $(
+                    $(extern $cc:tt)? fn $fn_id:ident($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:tt;
+                )*
+            }
+        )*
+    ) => {
+        $(
+            $vs unsafe trait $name {
+                const __NO_OBJ_SAFETY: () = ();
+
+                $(
+                    #[inline(always)]
+                    #[allow(non_snake_case)]
+                    $(extern $cc)? fn $fn_id(&self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
+                        unsafe {
+                            let slot = *(self as *const Self as *const usize) + $idx * std::mem::size_of::<usize>();
+                            (*std::mem::transmute::<_, *const $(extern $cc)? fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
+                            (self, $($arg_id),*);
+                        }
+                    }
+                )*
+            }
             $(
-                impl $name for $impl_target { }
-            )*
-        )?
+                $(
+                    unsafe impl $name for $target { }
+                )*
+            )?
+        )*
     };
 }

@@ -34,3 +34,14 @@ impl From<MEMORY_BASIC_INFORMATION> for MemoryBasicInformation {
         }
     }
 }
+
+/// Resolves multilevel pointer.
+/// # Behavior
+/// It begins from adding to base first offset and reading a value on this address, assigns to 
+/// base readed value and so on.
+pub unsafe fn follow_pointer_path<const I: usize, T>(mut base: *const u8, offsets: [usize; I]) -> *const T {
+    for offset in &offsets {
+        base = *((base as usize + *offset) as *const usize) as _;
+    }
+    base as _
+}

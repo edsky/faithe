@@ -27,7 +27,7 @@ pub use error::*;
 
 mod macros;
 
-/// Casts a pointer to an immutable reference for a convenient use.
+/// Casts a pointer to an immutable reference.
 /// # Safety
 /// NO
 #[inline(always)]
@@ -35,7 +35,7 @@ pub unsafe fn to_ref<'a, T>(ptr: *const T) -> &'a T {
     &*ptr
 }
 
-/// Casts a pointer to a mutable reference for a convenient use.
+/// Casts a pointer to a mutable reference.
 /// # Safety
 /// NO
 #[inline(always)]

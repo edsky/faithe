@@ -1,11 +1,11 @@
 /// Get size in bytes of types and variables.
 /// ```
 /// # use faithe::size_of;
-/// /// Get's size of the type in bytes.
+/// /// Gets size of the type in bytes.
 /// assert_eq!(size_of!(u32), 4);
 ///
 /// let var = 5u64;
-/// // Use `@` sign to get size of variable.
+/// // Use `@` to get size of variable.
 /// assert_eq!(size_of!(@ var), 8);
 /// ```
 #[macro_export]
