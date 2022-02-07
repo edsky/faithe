@@ -75,30 +75,33 @@ let address = process.find_pattern(
 ```rust
 use faithe::{interface, xstruct};
 
-struct CEntity;
-
 // Creates a trait that will emulate behavior of virtual functions in C++.
+struct CPlayer;
 interface! {
-    trait IEntity {
-        0 @ fn get_health() -> u32;
-        1 @ fn set_health(new_value: u32);
+    trait IEntity(CPlayer) {
+        extern "C" fn get_health() -> i32 = 0;
+        extern "C" fn set_health(new: i32) = 1;
     }
-    impl for CEntity;
-    /*
-    class IEntity {
-        virtual int get_health() = 0;
-        virtual void set_health(int new_value) = 0;
-    };
-    */
 }
+/*
+class CPlayer {
+    virtual int get_health() = 0;
+    virtual void set_health(int new_value) = 0;
+};
+*/
 
 // Creates struct with explicitly defined offsets.
 xstruct! {
-    struct CPlayer {
-        // health will be availble at offset 0x100
-        0x100 @ health: u32,
-        // stamina will be availble at offset 0x100
-        0x250 @ stamina: f32
+    // STRUCT HAS SIZE OF ZERO.
+    struct Foo {
+        0x0 @ a: u32,
+        0x16 @ b: bool
+    }
+
+    // STRUCT HAS SIZE 20.
+    struct Bar(20) {
+        0x0 @ a: u32,
+        0x16 @ b: bool
     }
 }
 ```
