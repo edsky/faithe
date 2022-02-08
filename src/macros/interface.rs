@@ -14,7 +14,7 @@ macro_rules! interface {
         $(
             $vs:vis trait $name:ident$(($($target:ident),*))? {
                 $(
-                    $(extern $cc:tt)? fn $fn_id:ident($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:tt;
+                    extern $cc:tt fn $fn_id:ident($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:tt;
                 )*
             }
         )*
@@ -26,10 +26,10 @@ macro_rules! interface {
                 $(
                     #[inline(always)]
                     #[allow(non_snake_case)]
-                    $(extern $cc)? fn $fn_id(&self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
+                    extern $cc fn $fn_id(&self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
                         unsafe {
                             let slot = *(self as *const Self as *const usize) + $idx * std::mem::size_of::<usize>();
-                            (*std::mem::transmute::<_, *const $(extern $cc)? fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
+                            (*std::mem::transmute::<_, *const extern $cc fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
                             (self, $($arg_id),*);
                         }
                     }
