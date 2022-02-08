@@ -26,6 +26,7 @@ mod error;
 pub use error::*;
 
 mod macros;
+pub use macros::*;
 
 /// Casts a pointer to an immutable reference.
 /// # Safety

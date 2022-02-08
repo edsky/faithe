@@ -5,7 +5,7 @@ Memory hacking library for windows.
 ```toml
 # Latest version
 [dependencies]
-faithe = "0.3.0"
+faithe = "0.5.0"
 
 # Development version
 [dependencies.faithe]
@@ -104,4 +104,11 @@ xstruct! {
         0x16 @ b: bool
     }
 }
+
+// Creates a function with explicitly defined RVA relative to some module.
+function! {
+    // Explicitly defined RVA relative to `01-hello` module.
+    extern FUNC: extern "C" fn(a: i32) = "01-hello.exe"@0x1900;
+}
+FUNC.call(5);
 ```

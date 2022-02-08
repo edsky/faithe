@@ -1,6 +1,7 @@
 /// Creates an trait that emulates virtual table behavior from C++.
 /// ```
 /// # use faithe::interface;
+/// struct CPlayer;
 /// interface! {
 ///     trait IEntity(CPlayer) {
 ///         // 1 - is an index of this function in the table.
@@ -20,9 +21,7 @@ macro_rules! interface {
         )*
     ) => {
         $(
-            $vs unsafe trait $name {
-                const __NO_OBJ_SAFETY: () = ();
-
+            $vs unsafe trait $name: ::std::marker::Sized {
                 $(
                     #[inline(always)]
                     #[allow(non_snake_case)]
