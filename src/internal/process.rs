@@ -95,6 +95,7 @@ pub struct UnicodeString {
 }
 
 impl UnicodeString {
+    /// Converts wide string into [`String`] by cloning data.
     pub fn decode_utf16(&self) -> String {
         unsafe {
             let utf16 = std::slice::from_raw_parts(self.buffer, self.len as usize / sof::<u16>());
