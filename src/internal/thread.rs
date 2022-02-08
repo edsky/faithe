@@ -1,6 +1,6 @@
-use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
+use super::Peb;
 use std::ptr::null_mut;
-use super::PEB;
+use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
 
 type ThreadInit<T> = unsafe extern "system" fn(Option<Box<T>>) -> u32;
 
@@ -24,16 +24,16 @@ pub fn create_thread<T>(init: ThreadInit<T>, param: Option<T>) -> u32 {
 
 /// Thread Environmental Block.
 #[repr(C)]
-pub struct TEB {
+pub struct Teb {
     _pad: [u8; 0x60],
     /// Reference to process environmental block.
-    pub process_environmental_block: &'static PEB
+    pub process_environmental_block: &'static Peb,
 }
 
 /// Returns an address of TEB(Thread Environmental Block).
 #[cfg(feature = "nightly")]
 #[inline(always)]
-pub fn get_teb<'a>() -> &'a TEB {
+pub fn get_teb<'a>() -> &'a Teb {
     unsafe {
         let mut teb: usize;
         std::arch::asm! {

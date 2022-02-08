@@ -2,7 +2,7 @@ use std::cell::UnsafeCell;
 
 enum InnerOffset {
     Explicit(usize),
-    Resolved(usize)
+    Resolved(usize),
 }
 
 // @TODO: Replace with `OnceCell` from `once_cell` crate.
@@ -14,7 +14,7 @@ impl RuntimeOffset {
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Resolved(address) => address,
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         }
     }
@@ -24,7 +24,7 @@ impl RuntimeOffset {
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Resolved(_) => true,
-                _ => false
+                _ => false,
             }
         }
     }
@@ -36,7 +36,7 @@ impl RuntimeOffset {
             match *(self.0.get()) {
                 InnerOffset::Explicit(offset) => {
                     *self.0.get() = InnerOffset::Resolved(address + offset);
-                },
+                }
                 InnerOffset::Resolved(_) => unreachable!(),
             }
         }
@@ -56,7 +56,7 @@ macro_rules! function {
         )*
     ) => {
         $(
-            $vs static $name: $name = $name { 
+            $vs static $name: $name = $name {
                 module: $lib_name,
                 offset: $crate::RuntimeOffset::explicit($offset)
             };

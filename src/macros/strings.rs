@@ -16,5 +16,5 @@ macro_rules! c_str {
 macro_rules! pc_str {
     ($($str:tt),*) => {
         windows::Win32::Foundation::PSTR(concat!($($str),*, '\x00').as_ptr() as _)
-    };  
+    };
 }
