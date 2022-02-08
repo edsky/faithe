@@ -7,7 +7,7 @@ use windows::Win32::{
 
 /// Returns a handle to the current process.
 pub fn get_current_process() -> HANDLE {
-    unsafe { Threading::GetCurrentProcess() }
+    HANDLE(usize::MAX as isize)
 }
 
 /// Returns the id of the current process.
@@ -62,4 +62,24 @@ pub fn message_box(
     } else {
         Ok(())
     }
+}
+
+/// Process Environmental Block.
+#[repr(C)]
+pub struct PEB {
+    _pad0x2: [u8; 0x2],
+    /// If process is being debugged.
+    pub being_debugged: bool,
+    pad0x10: [u8; 0xD],
+    /// Base address of loaded image.
+    pub image_base_address: *const ()
+}
+
+/// Returns an address of PEB(Process Environmental Block).
+#[cfg(feature = "nightly")]
+#[inline(always)]
+pub fn get_peb() -> &'static PEB {
+    use super::get_teb;
+
+    get_teb().process_environmental_block
 }
