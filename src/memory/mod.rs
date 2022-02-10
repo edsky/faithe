@@ -39,6 +39,8 @@ impl From<MEMORY_BASIC_INFORMATION> for MemoryBasicInformation {
 /// # Behavior
 /// It begins from adding to base first offset and reading a value on this address, assigns to
 /// base readed value and so on.
+/// # Safety
+/// You need to make sure beforehand that all offsets will lead to valid memory addresses.
 pub unsafe fn follow_pointer_path<const I: usize, T>(
     mut base: *const u8,
     offsets: [usize; I],

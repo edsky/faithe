@@ -1,13 +1,5 @@
-use super::get_current_process;
-use crate::{pattern::Pattern, size_of, FaitheError};
-use std::mem::zeroed;
-use windows::Win32::{
-    Foundation::{HINSTANCE, PWSTR},
-    System::{
-        LibraryLoader::GetModuleHandleW,
-        ProcessStatus::{K32GetModuleInformation, MODULEINFO},
-    },
-};
+use windows::Win32::System::ProcessStatus::MODULEINFO;
+use crate::{pattern::Pattern, FaitheError};
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]
@@ -30,8 +22,35 @@ impl From<MODULEINFO> for ModuleInfo {
     }
 }
 
-/// Returns a handle to a module.
-pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> {
+/// Returns an address(its handle) of the module.
+/// Always returns Ok(address).
+#[cfg(feature = "nightly")]
+pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
+    use std::ptr::null_mut as null;
+
+    use super::get_peb;
+
+    unsafe {
+        let first = get_peb().ldr_data.in_memory_order_links.blink;
+        let mut current = first;
+        loop {
+            if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
+                break Ok((*current).dll_base as _);
+            }
+
+            current = (*current).in_memory_order_links.blink;
+            if current == first {
+                break Ok(null());
+            }
+        }
+    }
+}
+
+/// Returns an address(its handle) of the module.
+#[cfg(not(feature = "nightly"))]
+pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
+    use windows::Win32::{System::LibraryLoader::GetModuleHandleW, Foundation::PWSTR};
+
     let mut utf16 = format!("{}\x00", mod_name.as_ref())
         .encode_utf16()
         .collect::<Vec<u16>>();
@@ -41,18 +60,48 @@ pub fn get_module_handle(mod_name: impl AsRef<str>) -> crate::Result<HINSTANCE> 
         if handle.is_invalid() {
             Err(FaitheError::last_error())
         } else {
-            Ok(handle)
+            Ok(handle.0 as _)
         }
     }
 }
 
-/// Returns information about module.
+/// Returns information about the specified module.
+#[cfg(feature = "nightly")]
 pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
+    use super::get_peb;
+
+    unsafe {
+        let first = get_peb().ldr_data.in_memory_order_links.blink;
+        let mut current = first;
+        loop {
+            if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
+                break Ok(ModuleInfo {
+                    dll_base: (*current).dll_base,
+                    image_size: (*current).image_size as _,
+                    entry_point: (*current).entry_point,
+                });
+            }
+
+            current = (*current).in_memory_order_links.blink;
+            if current == first {
+                break Err(FaitheError::ModuleNotFound);
+            }
+        }
+    }
+}
+
+/// Returns information about the specified module.
+#[cfg(not(feature = "nightly"))]
+pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
+    use windows::Win32::{System::ProcessStatus::K32GetModuleInformation, Foundation::HINSTANCE};
+    use crate::{internal::get_current_process, size_of};
+    use std::mem::zeroed;
+
     unsafe {
         let mut mod_info = zeroed();
         if K32GetModuleInformation(
             get_current_process(),
-            get_module_handle(mod_name)?,
+            HINSTANCE(get_module_address(mod_name)? as _),
             &mut mod_info,
             size_of!(@mod_info) as _,
         ) == false

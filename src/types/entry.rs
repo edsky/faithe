@@ -9,3 +9,14 @@ pub struct ListEntry<T> {
     /// Previous
     pub blink: *mut T,
 }
+
+impl<T> Clone for ListEntry<T> {
+    fn clone(&self) -> Self {
+        Self {
+            flink: self.flink,
+            blink: self.blink,
+        }
+    }
+}
+
+impl<T> Copy for ListEntry<T> {}

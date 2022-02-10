@@ -100,11 +100,10 @@ impl UnicodeString {
 
 #[repr(C)]
 pub struct LdrDataTableEntry {
-    _pad0x10: [u8; 0x10],
     pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
     _pad0x30: [u8; 0x10],
-    pub dll_base: *const (),
-    pub entry_point: *const (),
+    pub dll_base: *mut (),
+    pub entry_point: *mut (),
     pub image_size: u32,
     pub full_dll_name: UnicodeString,
     pub base_dll_name: UnicodeString,
@@ -113,6 +112,7 @@ pub struct LdrDataTableEntry {
 #[repr(C)]
 pub struct PebLdrData {
     pub len: u32,
+    _pad0x20: [u8; 0x1C],
     pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
 }
 

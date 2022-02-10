@@ -22,16 +22,13 @@ impl RuntimeOffset {
     #[inline(always)]
     pub fn is_resolved(&self) -> bool {
         unsafe {
-            match *(self.0.get()) {
-                InnerOffset::Resolved(_) => true,
-                _ => false,
-            }
+            matches!(*(self.0.get()), InnerOffset::Resolved(_))
         }
     }
 
     #[inline]
     pub fn resolve(&self, module: &'static str) {
-        let address = crate::internal::get_module_handle(module).unwrap().0 as usize;
+        let address = crate::internal::get_module_address(module).unwrap() as usize;
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Explicit(offset) => {
