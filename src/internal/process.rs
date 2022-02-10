@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-use crate::FaitheError;
+use crate::{types::ListEntry, FaitheError};
 use std::mem::size_of as sof;
 use windows::Win32::{
     Foundation::{HANDLE, HWND, PWSTR},
@@ -82,12 +82,6 @@ pub struct Peb {
 }
 
 #[repr(C)]
-pub struct ListEntry<'a, T> {
-    pub flink: &'a mut T,
-    pub blink: &'a mut T,
-}
-
-#[repr(C)]
 pub struct UnicodeString {
     pub len: u16,
     pub maximum_len: u16,
@@ -107,7 +101,7 @@ impl UnicodeString {
 #[repr(C)]
 pub struct LdrDataTableEntry {
     _pad0x10: [u8; 0x10],
-    pub in_memory_order_links: ListEntry<'static, LdrDataTableEntry>,
+    pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
     _pad0x30: [u8; 0x10],
     pub dll_base: *const (),
     pub entry_point: *const (),
@@ -119,7 +113,7 @@ pub struct LdrDataTableEntry {
 #[repr(C)]
 pub struct PebLdrData {
     pub len: u32,
-    pub in_memory_order_links: ListEntry<'static, LdrDataTableEntry>,
+    pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
 }
 
 /// Returns an address of PEB(Process Environmental Block).
