@@ -28,6 +28,14 @@ use windows::Win32::{
 pub struct Process(HANDLE);
 
 impl Process {
+    /// Creates process from handle.
+    /// # Safety
+    /// Passed handle must never be used/closed after its move.
+    /// This structure will close handle by itself when dropped.
+    pub unsafe fn from_handle(h: HANDLE) -> Self {
+        Self(h)
+    }
+
     /// Opens process by it's id.
     pub fn open_by_id(
         id: u32,
