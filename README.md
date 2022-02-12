@@ -107,7 +107,7 @@ xstruct! {
 
 // Creates a function with explicitly defined RVA relative to some module.
 function! {
-    // Explicitly defined RVA relative to `01-hello` module.
+    // Explicitly defined RVA offset relative to `01-hello` module.
     extern FUNC: extern "C" fn(a: i32) = "01-hello.exe"@0x1900;
 }
 FUNC.call(5);

@@ -43,6 +43,13 @@ impl RuntimeOffset {
 }
 
 /// Creates function that resolves its address on the first call.
+/// ```ignore
+/// function! {
+///     // Explicitly defined RVA offset relative to `01-hello` module.
+///     extern FUNC: extern "C" fn(a: i32) = "01-hello.exe"@0x1900;
+/// }
+/// FUNC.call(5);
+/// ```
 #[macro_export]
 macro_rules! function {
     (
