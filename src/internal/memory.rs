@@ -1,18 +1,20 @@
 use crate::{memory::MemoryBasicInformation, size_of, FaitheError};
 use std::mem::zeroed;
 use windows::Win32::System::Memory::{
-    VirtualAlloc, VirtualFree, VirtualProtect, VirtualQuery, PAGE_PROTECTION_FLAGS,
-    VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
+    VirtualAlloc, VirtualFree, VirtualQuery, PAGE_PROTECTION_FLAGS, VIRTUAL_ALLOCATION_TYPE,
+    VIRTUAL_FREE_TYPE,
 };
 
 /// Changes the protection of memory pages of the target process.
-/// For more info see [microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotectex).
+/// For more info see [microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect).
 #[rustfmt::skip]
 pub fn virtual_protect(
-    address: usize,
+    address: *mut (),
     size: usize,
     new_protection: PAGE_PROTECTION_FLAGS,
 ) -> crate::Result<PAGE_PROTECTION_FLAGS> {
+    use windows::Win32::System::Memory::VirtualProtect;
+
     unsafe {
         let mut old = zeroed();
         if VirtualProtect(
@@ -36,7 +38,7 @@ pub fn virtual_allocate(
     size: usize,
     allocation_type: VIRTUAL_ALLOCATION_TYPE,
     protection: PAGE_PROTECTION_FLAGS,
-) -> crate::Result<usize> {
+) -> crate::Result<*mut ()> {
     unsafe {
         let region = VirtualAlloc(
             address as _,

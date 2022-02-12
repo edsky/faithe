@@ -21,9 +21,7 @@ impl RuntimeOffset {
 
     #[inline(always)]
     pub fn is_resolved(&self) -> bool {
-        unsafe {
-            matches!(*(self.0.get()), InnerOffset::Resolved(_))
-        }
+        unsafe { matches!(*(self.0.get()), InnerOffset::Resolved(_)) }
     }
 
     #[inline]

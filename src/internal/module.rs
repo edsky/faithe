@@ -1,5 +1,5 @@
-use windows::Win32::System::ProcessStatus::MODULEINFO;
 use crate::{pattern::Pattern, FaitheError};
+use windows::Win32::System::ProcessStatus::MODULEINFO;
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]
@@ -49,7 +49,7 @@ pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
 /// Returns an address(its handle) of the module.
 #[cfg(not(feature = "nightly"))]
 pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
-    use windows::Win32::{System::LibraryLoader::GetModuleHandleW, Foundation::PWSTR};
+    use windows::Win32::{Foundation::PWSTR, System::LibraryLoader::GetModuleHandleW};
 
     let mut utf16 = format!("{}\x00", mod_name.as_ref())
         .encode_utf16()
@@ -93,7 +93,7 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
 /// Returns information about the specified module.
 #[cfg(not(feature = "nightly"))]
 pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
-    use windows::Win32::{System::ProcessStatus::K32GetModuleInformation, Foundation::HINSTANCE};
+    use windows::Win32::{Foundation::HINSTANCE, System::ProcessStatus::K32GetModuleInformation};
     use crate::{internal::get_current_process, size_of};
     use std::mem::zeroed;
 
