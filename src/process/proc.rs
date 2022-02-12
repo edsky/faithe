@@ -238,7 +238,7 @@ impl Process {
         address: usize,
         written: &mut usize,
         buf: impl AsRef<[u8]>,
-    ) -> crate::Result<usize> {
+    ) -> crate::Result<()> {
         unsafe {
             if WriteProcessMemory(
                 self.0,
@@ -250,7 +250,7 @@ impl Process {
             {
                 Err(FaitheError::last_error())
             } else {
-                Ok(written)
+                Ok(())
             }
         }
     }
