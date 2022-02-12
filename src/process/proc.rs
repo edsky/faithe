@@ -165,7 +165,7 @@ impl Process {
     pub fn read_process_memory_buf(
         &self,
         address: usize,
-        mut buf: impl AsMut<[u8]>,
+        buf: impl AsMut<[u8]>,
     ) -> crate::Result<usize> {
         unsafe {
             let mut read = 0;
