@@ -233,7 +233,7 @@ impl Process {
 
     /// Writes process's memory at address by coping while buffer into the target memory.
     /// Returns the amount of bytes written.
-    pub fn write_process_memory_buf(
+    pub fn write_process_memory_ext(
         &self,
         address: usize,
         written: &mut usize,
