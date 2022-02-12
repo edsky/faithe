@@ -231,6 +231,30 @@ impl Process {
         }
     }
 
+    /// Writes process's memory at address by coping while buffer into the target memory.
+    /// Returns the amount of bytes written.
+    pub fn write_process_memory_buf(
+        &self,
+        address: usize,
+        written: &mut usize,
+        buf: impl AsRef<[u8]>,
+    ) -> crate::Result<usize> {
+        unsafe {
+            if WriteProcessMemory(
+                self.0,
+                address as _,
+                buf.as_ref().as_ptr() as _,
+                buf.as_ref().len(),
+                written,
+            ) == false
+            {
+                Err(FaitheError::last_error())
+            } else {
+                Ok(written)
+            }
+        }
+    }
+
     /// Changes the protection of memory pages of the target process.
     /// For more info see [microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotectex).
     #[rustfmt::skip]
