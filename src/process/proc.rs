@@ -233,12 +233,12 @@ impl Process {
 
     /// Writes process's memory at address by coping while buffer into the target memory.
     /// Returns the amount of bytes written.
-    pub fn write_process_memory_buf(
+    pub fn write_process_memory_ext(
         &self,
         address: usize,
         written: &mut usize,
         buf: impl AsRef<[u8]>,
-    ) -> crate::Result<usize> {
+    ) -> crate::Result<()> {
         unsafe {
             if WriteProcessMemory(
                 self.0,
@@ -250,7 +250,7 @@ impl Process {
             {
                 Err(FaitheError::last_error())
             } else {
-                Ok(written)
+                Ok(())
             }
         }
     }
