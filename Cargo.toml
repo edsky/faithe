@@ -17,7 +17,7 @@ default-target = "x86_64-pc-windows-msvc"
 targets = ["i686-pc-windows-msvc", "x86_64-pc-windows-msvc"]
 
 [features]
-default = ["nightly", "thiserror"]
+default = ["nightly", "thiserror", "windows"]
 no-std = []
 nightly = []
 external = [
@@ -45,3 +45,4 @@ features = [
     'Win32_Foundation',
     'Win32_Security',
 ]
+optional = true
