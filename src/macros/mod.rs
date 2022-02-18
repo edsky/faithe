@@ -3,5 +3,9 @@ mod sizeof;
 mod strings;
 mod xstruct;
 
-mod function;
-pub use function::*;
+cfg_if::cfg_if! {
+    if #[cfg(not(feature = "no-std"))] {
+        mod function;
+        pub use function::*;
+    }
+}

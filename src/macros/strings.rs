@@ -12,6 +12,7 @@ macro_rules! c_str {
 }
 
 /// Constructs new zero terminated string of type [`windows::Win32::Foundation::PSTR`].
+#[cfg(not(feature = "no-std"))]
 #[macro_export]
 macro_rules! pc_str {
     ($($str:tt),*) => {

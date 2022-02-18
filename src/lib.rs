@@ -1,8 +1,10 @@
 #![warn(missing_docs)]
-//! # Radon
+#![cfg_attr(feature = "no-std", no_std)]
+//! # Faithe
 //! Useful stuff for memory hacking in windows.
 
 /// APIs for internal interation with current process.
+#[cfg(not(feature = "no-std"))]
 pub mod internal;
 /// Useful memory APIs.
 pub mod memory;
@@ -16,6 +18,7 @@ pub mod process;
 /// Iterator over threads and etc.
 pub mod thread;
 
+#[cfg(not(feature = "no-std"))]
 /// Pattern searching.
 pub mod pattern;
 

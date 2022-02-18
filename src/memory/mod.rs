@@ -3,6 +3,7 @@ use windows::Win32::System::Memory::{
 };
 
 /// Basic information about memory region.
+#[cfg(not(feature = "no-std"))]
 #[derive(Debug, Clone)]
 pub struct MemoryBasicInformation {
     /// Base address of region.
@@ -21,6 +22,7 @@ pub struct MemoryBasicInformation {
     pub memory_type: PAGE_TYPE,
 }
 
+#[cfg(not(feature = "no-std"))]
 impl From<MEMORY_BASIC_INFORMATION> for MemoryBasicInformation {
     fn from(v: MEMORY_BASIC_INFORMATION) -> Self {
         Self {
