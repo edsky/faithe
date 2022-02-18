@@ -100,6 +100,7 @@ impl UnicodeString {
 
 #[repr(C)]
 pub struct LdrDataTableEntry {
+    _pad0x10: [u8; 0x10],
     pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
     _pad0x30: [u8; 0x10],
     pub dll_base: *mut (),

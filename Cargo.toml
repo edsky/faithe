@@ -27,6 +27,7 @@ external = [
 ]
 
 [dependencies]
+memoffset = "0.6.5"
 cfg-if = "1.0.0"
 
 [dependencies.thiserror]

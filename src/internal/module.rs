@@ -27,17 +27,18 @@ impl From<MODULEINFO> for ModuleInfo {
 #[cfg(feature = "nightly")]
 pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
     use std::ptr::null_mut as null;
-
+    use crate::{containing_record, internal::LdrDataTableEntry};
     use super::get_peb;
 
     unsafe {
-        let first = get_peb().ldr_data.in_memory_order_links.blink;
+        let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
         let mut current = first;
         loop {
             if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
                 break Ok((*current).dll_base as _);
             }
-
+            
+            current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
             current = (*current).in_memory_order_links.blink;
             if current == first {
                 break Ok(null());
@@ -68,10 +69,11 @@ pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
 /// Returns information about the specified module.
 #[cfg(feature = "nightly")]
 pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
+    use crate::{containing_record, internal::LdrDataTableEntry};
     use super::get_peb;
 
     unsafe {
-        let first = get_peb().ldr_data.in_memory_order_links.blink;
+        let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
         let mut current = first;
         loop {
             if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
@@ -82,7 +84,7 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
                 });
             }
 
-            current = (*current).in_memory_order_links.blink;
+            current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
             if current == first {
                 break Err(FaitheError::ModuleNotFound);
             }
