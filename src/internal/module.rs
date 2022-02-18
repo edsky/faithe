@@ -26,7 +26,6 @@ impl From<MODULEINFO> for ModuleInfo {
 /// Always returns Ok(address).
 #[cfg(feature = "nightly")]
 pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
-    use std::ptr::null_mut as null;
     use crate::{containing_record, internal::LdrDataTableEntry};
     use super::get_peb;
 
@@ -41,7 +40,7 @@ pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
             current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
             current = (*current).in_memory_order_links.blink;
             if current == first {
-                break Ok(null());
+                break Err(FaitheError::ModuleNotFound);
             }
         }
     }
