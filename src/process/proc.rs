@@ -347,7 +347,7 @@ impl Process {
     pub fn create_remote_thread<T>(
         &self,
         address: usize,
-        param: &T,
+        param: *const T,
     ) -> crate::Result<(HANDLE, u32)> {
         unsafe {
             let mut t_id = 0;
@@ -356,7 +356,7 @@ impl Process {
                 null(),
                 0,
                 mem::transmute(address),
-                param as *const T as _,
+                param as _,
                 0,
                 &mut t_id,
             );
