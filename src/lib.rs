@@ -46,3 +46,5 @@ pub unsafe fn to_ref<'a, T>(ptr: *const T) -> &'a T {
 pub unsafe fn to_mut_ref<'a, T>(ptr: *const T) -> &'a mut T {
     &mut *(ptr as *mut T)
 }
+
+pub use memoffset::offset_of;

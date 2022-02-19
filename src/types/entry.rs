@@ -25,7 +25,7 @@ impl<T> Copy for ListEntry<T> {}
 #[macro_export]
 macro_rules! containing_record {
     ($next:expr, $type:ty, $field:tt) => {
-        $next.flink.cast::<u8>().sub(memoffset::offset_of!($type, $field)).cast::<$type>()
+        $next.flink.cast::<u8>().sub($crate::offset_of!($type, $field)).cast::<$type>()
     };
 }
 
