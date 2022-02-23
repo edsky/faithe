@@ -3,14 +3,14 @@
 /// Link of Doubly-linked list.
 #[derive(Debug)]
 #[repr(C)]
-pub struct ListEntry<T> {
+pub struct ListEntry {
     /// Next
-    pub flink: *mut T,
+    pub flink: *mut ListEntry,
     /// Previous
-    pub blink: *mut T,
+    pub blink: *mut ListEntry,
 }
 
-impl<T> Clone for ListEntry<T> {
+impl Clone for ListEntry {
     fn clone(&self) -> Self {
         Self {
             flink: self.flink,
@@ -19,7 +19,7 @@ impl<T> Clone for ListEntry<T> {
     }
 }
 
-impl<T> Copy for ListEntry<T> {}
+impl Copy for ListEntry {}
 
 /// Resolves next link in doubly-linked list.
 #[macro_export]

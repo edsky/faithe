@@ -1,7 +1,6 @@
 #![allow(missing_docs)]
 
-use crate::{types::ListEntry, FaitheError};
-use std::mem::size_of as sof;
+use crate::{types::{ListEntry, UnicodeString}, FaitheError};
 use windows::Win32::{
     Foundation::{HANDLE, HWND, PWSTR},
     System::{Console, Threading},
@@ -82,26 +81,9 @@ pub struct Peb {
 }
 
 #[repr(C)]
-pub struct UnicodeString {
-    pub len: u16,
-    pub maximum_len: u16,
-    pub buffer: *mut u16,
-}
-
-impl UnicodeString {
-    /// Converts wide string into [`String`] by cloning data.
-    pub fn decode_utf16(&self) -> String {
-        unsafe {
-            let utf16 = std::slice::from_raw_parts(self.buffer, self.len as usize / sof::<u16>());
-            String::from_utf16_lossy(utf16)
-        }
-    }
-}
-
-#[repr(C)]
 pub struct LdrDataTableEntry {
     _pad0x10: [u8; 0x10],
-    pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
+    pub in_memory_order_links: ListEntry,
     _pad0x30: [u8; 0x10],
     pub dll_base: *mut (),
     pub entry_point: *mut (),
@@ -114,7 +96,7 @@ pub struct LdrDataTableEntry {
 pub struct PebLdrData {
     pub len: u32,
     _pad0x20: [u8; 0x1C],
-    pub in_memory_order_links: ListEntry<LdrDataTableEntry>,
+    pub in_memory_order_links: ListEntry,
 }
 
 /// Returns an address of PEB(Process Environmental Block).

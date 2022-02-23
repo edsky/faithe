@@ -33,12 +33,13 @@ pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
         let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
         let mut current = first;
         loop {
-            if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
-                break Ok((*current).dll_base as _);
+            if let Some(s) = (*current).base_dll_name.decode_utf16() {
+                if s == mod_name.as_ref()  {
+                    break Ok((*current).dll_base as _);
+                }
             }
             
             current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
-            current = (*current).in_memory_order_links.blink;
             if current == first {
                 break Err(FaitheError::ModuleNotFound);
             }
@@ -75,12 +76,14 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
         let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
         let mut current = first;
         loop {
-            if (*current).base_dll_name.decode_utf16() == mod_name.as_ref() {
-                break Ok(ModuleInfo {
-                    dll_base: (*current).dll_base,
-                    image_size: (*current).image_size as _,
-                    entry_point: (*current).entry_point,
-                });
+            if let Some(s) = (*current).base_dll_name.decode_utf16() {
+                if s == mod_name.as_ref()  {
+                    break Ok(ModuleInfo {
+                        dll_base: (*current).dll_base,
+                        image_size: (*current).image_size as _,
+                        entry_point: (*current).entry_point,
+                    });
+                }
             }
 
             current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
