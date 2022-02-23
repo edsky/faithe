@@ -48,3 +48,4 @@ pub unsafe fn to_mut_ref<'a, T>(ptr: *const T) -> &'a mut T {
 }
 
 pub use memoffset::offset_of;
+pub use obfstr::wide;

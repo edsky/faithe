@@ -3,6 +3,18 @@ type String = alloc::string::String;
 
 use core::mem::size_of;
 
+/// Creates new unicode string.
+#[macro_export]
+macro_rules! unicode_string {
+    ($str:expr) => {
+        $crate::types::UnicodeString {
+            len: $str.len() as _,
+            maximum_len: $str.len() as _,
+            buffer: $crate::wide!($str).as_ptr() as _
+        }
+    };
+}
+
 /// UTF16 String.
 #[repr(C)]
 pub struct UnicodeString {
@@ -20,7 +32,7 @@ impl UnicodeString {
     /// This function doesn't check if `self.buffer` == 0.
     #[inline]
     pub unsafe fn decode_utf16_unchecked(&self) -> String {
-        let utf16 = std::slice::from_raw_parts(self.buffer, self.len as usize / size_of::<u16>());
+        let utf16 = core::slice::from_raw_parts(self.buffer, self.len as usize / size_of::<u16>());
         alloc::string::String::from_utf16_lossy(utf16)
     }
 
@@ -41,5 +53,17 @@ impl UnicodeString {
     #[inline]
     pub fn is_null(&self) -> bool {
         self.len == 0 || self.maximum_len == 0 || self.buffer.is_null()
+    }
+}
+
+impl PartialEq for UnicodeString {
+    fn eq(&self, other: &Self) -> bool {
+        if self.is_null() || other.is_null() || self.len != other.len {
+            false
+        } else {
+            unsafe {
+                libc::memcmp(self.buffer as _, other.buffer as _, self.len as _) == 0
+            }
+        }
     }
 }

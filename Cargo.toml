@@ -30,6 +30,11 @@ external = [
 [dependencies]
 memoffset = "0.6.5"
 cfg-if = "1.0.0"
+obfstr = "0.3.0"
+
+[dependencies.libc]
+version = "0.2"
+default-features = false
 
 [dependencies.thiserror]
 version = "1.0.0"

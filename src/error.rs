@@ -2,6 +2,7 @@
 /// Error type for all mistakes made in faithe.
 #[derive(Debug)]
 pub enum FaitheError {
+    #[cfg(not(feature = "no-std"))]
     /// Error code returned from `GetLastError()` WinAPI.
     ErrorCode(windows::Win32::Foundation::WIN32_ERROR),
     /// No process with selected name were found.
