@@ -8,8 +8,8 @@ use core::mem::size_of;
 macro_rules! unicode_string {
     ($str:expr) => {
         $crate::types::UnicodeString {
-            len: $str.len() as _,
-            maximum_len: $str.len() as _,
+            len: ($str.len() * 2) as _,
+            maximum_len: ($str.len() * 2) as _,
             buffer: $crate::wide!($str).as_ptr() as _
         }
     };
