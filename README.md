@@ -5,7 +5,7 @@ Memory hacking library for windows.
 ```toml
 # Latest version
 [dependencies]
-faithe = "0.5.0"
+faithe = "0.6.2"
 
 # Development version
 [dependencies.faithe]

@@ -1,5 +1,7 @@
+use std::ptr::NonNull;
+
 use crate::{pattern::Pattern, FaitheError};
-use windows::Win32::System::ProcessStatus::MODULEINFO;
+use windows::Win32::{System::{ProcessStatus::MODULEINFO, LibraryLoader::LoadLibraryW}, Foundation::PWSTR};
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]
@@ -18,6 +20,19 @@ impl From<MODULEINFO> for ModuleInfo {
             dll_base: mi.lpBaseOfDll as _,
             image_size: mi.SizeOfImage as _,
             entry_point: mi.EntryPoint as _,
+        }
+    }
+}
+
+/// Either loads library from path or returns an address of already existing module.
+pub fn load_library(lib_name: impl AsRef<str>) -> crate::Result<NonNull<()>> {
+    unsafe {
+        let utf16 = format!("{}\x00", lib_name.as_ref()).encode_utf16().collect::<Vec<_>>();
+        let lib = LoadLibraryW(PWSTR(utf16.as_ptr()));
+        if lib.is_invalid() {
+            Err(FaitheError::last_error())
+        } else {
+            Ok(NonNull::new_unchecked(lib.0 as _))
         }
     }
 }

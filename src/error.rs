@@ -11,11 +11,11 @@ pub enum FaitheError {
     ModuleNotFound,
 }
 
+pub(crate) type Result<T> = core::result::Result<T, FaitheError>;
+
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "no-std"))] {
         impl std::error::Error for FaitheError {}
-
-        pub(crate) type Result<T> = core::result::Result<T, FaitheError>;
 
         impl std::fmt::Display for FaitheError {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
