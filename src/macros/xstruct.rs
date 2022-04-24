@@ -1,5 +1,9 @@
 /// This macros allows you to generate structure with explicitly defined
 /// fields' offsets.
+/// # Syntax
+/// `#` - immutable access by immutable reference.
+/// `%` - mutable access by mutable reference.
+/// `@` - mutable access by immutable reference.
 /// # Warning
 /// This macros might generate ineffecient assembly code.
 /// ```
@@ -57,7 +61,7 @@ macro_rules! xstruct_field {
         #[allow(non_snake_case)]
         #[inline(always)]
         $flvm unsafe fn $field_name(&self) -> &$field_ty {
-            $crate::to_mut_ref((self as *const Self as usize + $offset) as _)
+            $crate::to_ref((self as *const Self as usize + $offset) as _)
         }
     };
     (% $offset:tt $flvm:vis $field_name:ident $field_ty:ty) => {
