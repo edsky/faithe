@@ -9,6 +9,9 @@ pub enum FaitheError {
     ProcessNotFound,
     /// No module with selected name were found.
     ModuleNotFound,
+    /// Protection that cannot be represented with internal type.
+    #[cfg(all(windows, not(feature = "no-std")))]
+    UnknownProtection(u32),
 }
 
 pub(crate) type Result<T> = core::result::Result<T, FaitheError>;
@@ -30,4 +33,3 @@ cfg_if::cfg_if! {
         }
     }
 }
-

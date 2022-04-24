@@ -1,6 +1,9 @@
 #![allow(missing_docs)]
 
-use crate::{types::{ListEntry, UnicodeString}, FaitheError};
+use crate::{
+    types::{ListEntry, UnicodeString},
+    FaitheError,
+};
 use windows::Win32::{
     Foundation::{HANDLE, HWND, PWSTR},
     System::{Console, Threading},

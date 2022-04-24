@@ -21,14 +21,14 @@ macro_rules! interface {
         )*
     ) => {
         $(
-            $vs unsafe trait $name: ::std::marker::Sized {
+            $vs unsafe trait $name: ::core::marker::Sized {
                 $(
                     #[inline(always)]
                     #[allow(non_snake_case)]
                     extern $cc fn $fn_id(&self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
                         unsafe {
-                            let slot = *(self as *const Self as *const usize) + $idx * std::mem::size_of::<usize>();
-                            (*std::mem::transmute::<_, *const extern $cc fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
+                            let slot = *(self as *const Self as *const usize) + $idx * core::mem::size_of::<usize>();
+                            (*core::mem::transmute::<_, *const extern $cc fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
                             (self, $($arg_id),*);
                         }
                     }

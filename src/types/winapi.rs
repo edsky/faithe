@@ -15,6 +15,7 @@ pub mod messagebox_styles {
 }
 
 /// Flags that can be used with [`crate::process::Process::open_by_id`], [`crate::process::Process::open_by_name`] and etc.
+#[cfg(feature = "external")]
 pub mod access_rights {
     pub use windows::Win32::System::Threading::{
         PROCESS_ACCESS_RIGHTS, PROCESS_ALL_ACCESS, PROCESS_CREATE_PROCESS, PROCESS_CREATE_THREAD,
@@ -27,7 +28,7 @@ pub mod access_rights {
     };
 }
 
-/// Flags that can be used with [`crate::process::Process::virtual_protect`]
+/// Flags that can be used with [`crate::internal::protect`]
 pub mod protection_flags {
     pub use windows::Win32::System::Memory::{
         PAGE_ENCLAVE_DECOMMIT, PAGE_ENCLAVE_MASK, PAGE_ENCLAVE_SS_FIRST, PAGE_ENCLAVE_SS_REST,
@@ -43,7 +44,7 @@ pub mod protection_flags {
     };
 }
 
-/// Types of allocation that can be used with [`crate::process::Process::virtual_allocate`]
+/// Types of allocation that can be used with [`crate::internal::allocate`]
 pub mod allocation_types {
     pub use windows::Win32::System::Memory::{
         MEM_COMMIT, MEM_FREE, MEM_LARGE_PAGES, MEM_REPLACE_PLACEHOLDER, MEM_RESERVE,
@@ -51,7 +52,7 @@ pub mod allocation_types {
     };
 }
 
-/// Types of freeing that can be used with [`crate::process::Process::virtual_free`]
+/// Types of freeing that can be used with [`crate::internal::free`]
 pub mod free_types {
     pub use windows::Win32::System::Memory::{MEM_DECOMMIT, MEM_RELEASE, VIRTUAL_FREE_TYPE};
 }

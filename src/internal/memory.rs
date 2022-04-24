@@ -1,18 +1,20 @@
-use crate::{memory::MemoryBasicInformation, size_of, FaitheError};
+use crate::{
+    memory::{MemoryBasicInformation, MemoryProtection},
+    size_of, FaitheError,
+};
 use std::mem::zeroed;
 use windows::Win32::System::Memory::{
-    VirtualAlloc, VirtualFree, VirtualQuery, PAGE_PROTECTION_FLAGS, VIRTUAL_ALLOCATION_TYPE,
-    VIRTUAL_FREE_TYPE,
+    VirtualAlloc, VirtualFree, VirtualQuery, VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
 };
 
 /// Changes the protection of memory pages of the target process.
 /// For more info see [microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect).
 #[rustfmt::skip]
-pub fn virtual_protect(
+pub fn protect(
     address: *mut (),
     size: usize,
-    new_protection: PAGE_PROTECTION_FLAGS,
-) -> crate::Result<PAGE_PROTECTION_FLAGS> {
+    new_protection: MemoryProtection,
+) -> crate::Result<MemoryProtection> {
     use windows::Win32::System::Memory::VirtualProtect;
 
     unsafe {
@@ -20,12 +22,12 @@ pub fn virtual_protect(
         if VirtualProtect(
             address as _,
             size,
-            new_protection,
+            new_protection.to_os(),
             &mut old
         ) == false {
             Err(FaitheError::last_error())
         } else {
-            Ok(old)
+            MemoryProtection::from_os(old).ok_or(FaitheError::UnknownProtection(old.0))
         }
     }
 }
@@ -33,18 +35,18 @@ pub fn virtual_protect(
 /// Tries to allocate memory pages in the target process.
 /// On success returns the address of allocated region.
 #[rustfmt::skip]
-pub fn virtual_allocate(
+pub fn allocate(
     address: usize,
     size: usize,
     allocation_type: VIRTUAL_ALLOCATION_TYPE,
-    protection: PAGE_PROTECTION_FLAGS,
+    protection: MemoryProtection,
 ) -> crate::Result<*mut ()> {
     unsafe {
         let region = VirtualAlloc(
             address as _,
             size,
             allocation_type,
-            protection
+            protection.to_os()
         );
 
         if region.is_null() {
@@ -57,7 +59,7 @@ pub fn virtual_allocate(
 
 /// Tries to free memory pages in the target process.
 #[rustfmt::skip]
-pub fn virtual_free(
+pub fn free(
     address: usize,
     size: usize,
     free_type: VIRTUAL_FREE_TYPE
@@ -77,7 +79,8 @@ pub fn virtual_free(
 }
 
 /// Queries basic information about memory region at `address`.
-pub fn virtual_query(address: usize) -> crate::Result<MemoryBasicInformation> {
+#[cfg(windows)]
+pub fn query(address: usize) -> crate::Result<MemoryBasicInformation> {
     unsafe {
         let mut mem_info = zeroed();
         if VirtualQuery(address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {

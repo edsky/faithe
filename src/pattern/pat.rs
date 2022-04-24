@@ -92,24 +92,28 @@ impl Pattern {
     }
 
     /// Searches for all occurences in the specified memory region.
-    pub unsafe fn find_all(&self, start_region: *const u8, region_size: usize) -> impl Iterator<Item = *const u8> + '_ {
-        core::slice::from_raw_parts(
-            start_region,
-            region_size
-        ).windows(self.len())
-        .enumerate()
-        .filter(|(_, s)| self.matches(s))
-        .map(move |(i, _)| start_region.add(i))
+    pub unsafe fn find_all(
+        &self,
+        start_region: *const u8,
+        region_size: usize,
+    ) -> impl Iterator<Item = *const u8> + '_ {
+        core::slice::from_raw_parts(start_region, region_size)
+            .windows(self.len())
+            .enumerate()
+            .filter(|(_, s)| self.matches(s))
+            .map(move |(i, _)| start_region.add(i))
     }
 
     /// Searches for the first occurence of pattern in the specified memory region.
-    pub unsafe fn find_first(&self, start_region: *const u8, region_size: usize) -> Option<*const u8> {
-        core::slice::from_raw_parts(
-            start_region,
-            region_size
-        ).windows(self.len())
-        .enumerate()
-        .find(|(_, s)| self.matches(s))
-        .map(|(i, _)| start_region.add(i))
+    pub unsafe fn find_first(
+        &self,
+        start_region: *const u8,
+        region_size: usize,
+    ) -> Option<*const u8> {
+        core::slice::from_raw_parts(start_region, region_size)
+            .windows(self.len())
+            .enumerate()
+            .find(|(_, s)| self.matches(s))
+            .map(|(i, _)| start_region.add(i))
     }
 }

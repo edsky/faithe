@@ -1,5 +1,4 @@
 #![cfg_attr(feature = "no-std", no_std)]
-
 #![warn(missing_docs)]
 //! # Faithe
 //! Useful stuff for memory hacking in windows.

@@ -10,7 +10,7 @@ macro_rules! unicode_string {
         $crate::types::UnicodeString {
             len: ($str.len() * 2) as _,
             maximum_len: ($str.len() * 2) as _,
-            buffer: $crate::wide!($str).as_ptr() as _
+            buffer: $crate::wide!($str).as_ptr() as _,
         }
     };
 }
@@ -61,9 +61,7 @@ impl PartialEq for UnicodeString {
         if self.is_null() || other.is_null() || self.len != other.len {
             false
         } else {
-            unsafe {
-                libc::memcmp(self.buffer as _, other.buffer as _, self.len as _) == 0
-            }
+            unsafe { libc::memcmp(self.buffer as _, other.buffer as _, self.len as _) == 0 }
         }
     }
 }

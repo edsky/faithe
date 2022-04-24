@@ -1,7 +1,10 @@
 use std::ptr::NonNull;
 
 use crate::{pattern::Pattern, FaitheError};
-use windows::Win32::{System::{ProcessStatus::MODULEINFO, LibraryLoader::LoadLibraryW}, Foundation::PWSTR};
+use windows::Win32::{
+    Foundation::PWSTR,
+    System::{LibraryLoader::LoadLibraryW, ProcessStatus::MODULEINFO},
+};
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]
@@ -27,7 +30,9 @@ impl From<MODULEINFO> for ModuleInfo {
 /// Either loads library from path or returns an address of already existing module.
 pub fn load_library(lib_name: impl AsRef<str>) -> crate::Result<NonNull<()>> {
     unsafe {
-        let utf16 = format!("{}\x00", lib_name.as_ref()).encode_utf16().collect::<Vec<_>>();
+        let utf16 = format!("{}\x00", lib_name.as_ref())
+            .encode_utf16()
+            .collect::<Vec<_>>();
         let lib = LoadLibraryW(PWSTR(utf16.as_ptr()));
         if lib.is_invalid() {
             Err(FaitheError::last_error())
@@ -41,20 +46,28 @@ pub fn load_library(lib_name: impl AsRef<str>) -> crate::Result<NonNull<()>> {
 /// Always returns Ok(address).
 #[cfg(feature = "nightly")]
 pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
-    use crate::{containing_record, internal::LdrDataTableEntry};
     use super::get_peb;
+    use crate::{containing_record, internal::LdrDataTableEntry};
 
     unsafe {
-        let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
+        let first = containing_record!(
+            get_peb().ldr_data.in_memory_order_links,
+            LdrDataTableEntry,
+            in_memory_order_links
+        );
         let mut current = first;
         loop {
             if let Some(s) = (*current).base_dll_name.decode_utf16() {
-                if s == mod_name.as_ref()  {
+                if s == mod_name.as_ref() {
                     break Ok((*current).dll_base as _);
                 }
             }
-            
-            current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
+
+            current = containing_record!(
+                (*current).in_memory_order_links,
+                LdrDataTableEntry,
+                in_memory_order_links
+            );
             if current == first {
                 break Err(FaitheError::ModuleNotFound);
             }
@@ -84,15 +97,19 @@ pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
 /// Returns information about the specified module.
 #[cfg(feature = "nightly")]
 pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
-    use crate::{containing_record, internal::LdrDataTableEntry};
     use super::get_peb;
+    use crate::{containing_record, internal::LdrDataTableEntry};
 
     unsafe {
-        let first = containing_record!(get_peb().ldr_data.in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
+        let first = containing_record!(
+            get_peb().ldr_data.in_memory_order_links,
+            LdrDataTableEntry,
+            in_memory_order_links
+        );
         let mut current = first;
         loop {
             if let Some(s) = (*current).base_dll_name.decode_utf16() {
-                if s == mod_name.as_ref()  {
+                if s == mod_name.as_ref() {
                     break Ok(ModuleInfo {
                         dll_base: (*current).dll_base,
                         image_size: (*current).image_size as _,
@@ -101,7 +118,11 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
                 }
             }
 
-            current = containing_record!((*current).in_memory_order_links, LdrDataTableEntry, in_memory_order_links);
+            current = containing_record!(
+                (*current).in_memory_order_links,
+                LdrDataTableEntry,
+                in_memory_order_links
+            );
             if current == first {
                 break Err(FaitheError::ModuleNotFound);
             }
@@ -112,9 +133,9 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
 /// Returns information about the specified module.
 #[cfg(not(feature = "nightly"))]
 pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<ModuleInfo> {
-    use windows::Win32::{Foundation::HINSTANCE, System::ProcessStatus::K32GetModuleInformation};
     use crate::{internal::get_current_process, size_of};
     use std::mem::zeroed;
+    use windows::Win32::{Foundation::HINSTANCE, System::ProcessStatus::K32GetModuleInformation};
 
     unsafe {
         let mut mod_info = zeroed();
