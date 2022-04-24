@@ -17,7 +17,7 @@ default-target = "x86_64-pc-windows-msvc"
 targets = ["i686-pc-windows-msvc", "x86_64-pc-windows-msvc"]
 
 [features]
-default = ["nightly", "thiserror", "windows"]
+default = ["nightly", "thiserror", "windows", "external"]
 no-std = []
 alloc = []
 nightly = []

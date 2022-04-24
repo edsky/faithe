@@ -1,6 +1,6 @@
 use super::Processes;
 use crate::{
-    memory::MemoryBasicInformation,
+    memory::{MemoryBasicInformation, MemoryProtection},
     module::Modules,
     pattern::{Pattern, PatternSearcher},
     size_of,
@@ -16,7 +16,7 @@ use windows::Win32::{
     System::{
         Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory},
         Memory::{
-            VirtualAllocEx, VirtualFreeEx, VirtualProtectEx, VirtualQueryEx, PAGE_PROTECTION_FLAGS,
+            VirtualAllocEx, VirtualFreeEx, VirtualProtectEx, VirtualQueryEx,
             VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
         },
         ProcessStatus::K32GetModuleFileNameExW,
@@ -121,7 +121,7 @@ impl Process {
     }
 
     /// Reads process's memory at address and returns read value.
-    pub fn read_process_memory<T>(&self, address: usize) -> crate::Result<T> {
+    pub fn read<T>(&self, address: usize) -> crate::Result<T> {
         unsafe {
             let mut buf = zeroed();
             let mut _read = 0;
@@ -141,7 +141,7 @@ impl Process {
     }
 
     /// Reads process's memory at address and returns read value and amount of bytes read.
-    pub fn read_process_memory_ext<T>(&self, address: usize) -> crate::Result<(T, usize)> {
+    pub fn read_ext<T>(&self, address: usize) -> crate::Result<(T, usize)> {
         unsafe {
             let mut buf = zeroed();
             let mut read = 0;
@@ -162,7 +162,7 @@ impl Process {
 
     /// Reads process's memory at address and copy `buf.len()` bytes into buffer.
     /// Returns the amount of bytes read.
-    pub fn read_process_memory_buf(
+    pub fn read_buf(
         &self,
         address: usize,
         mut buf: impl AsMut<[u8]>,
@@ -186,7 +186,7 @@ impl Process {
 
     /// Writes process's memory at address by copying value into the target memory.
     /// Returns the amount of bytes written.
-    pub fn write_process_memory<T>(&self, address: usize, value: T) -> crate::Result<usize>
+    pub fn write<T>(&self, address: usize, value: T) -> crate::Result<usize>
     where
         T: Clone,
     {
@@ -207,33 +207,9 @@ impl Process {
         }
     }
 
-    /// Writes process's memory at address by copying whole buffer into the target memory.
-    /// Returns the amount of bytes written.
-    pub fn write_process_memory_buf(
-        &self,
-        address: usize,
-        buf: impl AsRef<[u8]>,
-    ) -> crate::Result<usize> {
-        unsafe {
-            let mut written = 0;
-            if WriteProcessMemory(
-                self.0,
-                address as _,
-                buf.as_ref().as_ptr() as _,
-                buf.as_ref().len(),
-                &mut written,
-            ) == false
-            {
-                Err(FaitheError::last_error())
-            } else {
-                Ok(written)
-            }
-        }
-    }
-
     /// Writes process's memory at address by coping while buffer into the target memory.
     /// Returns the amount of bytes written.
-    pub fn write_process_memory_ext(
+    pub fn write_ext(
         &self,
         address: usize,
         written: &mut usize,
@@ -255,27 +231,51 @@ impl Process {
         }
     }
 
+    /// Writes process's memory at address by copying whole buffer into the target memory.
+    /// Returns the amount of bytes written.
+    pub fn write_buf(
+        &self,
+        address: usize,
+        buf: impl AsRef<[u8]>,
+    ) -> crate::Result<usize> {
+        unsafe {
+            let mut written = 0;
+            if WriteProcessMemory(
+                self.0,
+                address as _,
+                buf.as_ref().as_ptr() as _,
+                buf.as_ref().len(),
+                &mut written,
+            ) == false
+            {
+                Err(FaitheError::last_error())
+            } else {
+                Ok(written)
+            }
+        }
+    }
+
     /// Changes the protection of memory pages of the target process.
     /// For more info see [microsoft documentation](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotectex).
     #[rustfmt::skip]
-    pub fn virtual_protect(
+    pub fn protect(
         &self,
         address: usize,
         size: usize,
-        new_protection: PAGE_PROTECTION_FLAGS,
-    ) -> crate::Result<PAGE_PROTECTION_FLAGS> {
+        new_protection: MemoryProtection,
+    ) -> crate::Result<MemoryProtection> {
         unsafe {
             let mut old = zeroed();
             if VirtualProtectEx(
                 self.0,
                 address as _,
                 size,
-                new_protection,
+                new_protection.to_os(),
                 &mut old
             ) == false {
                 Err(FaitheError::last_error())
             } else {
-                Ok(old)
+                MemoryProtection::from_os(old).ok_or(FaitheError::UnknownProtection(old.0))
             }
         }
     }
@@ -283,12 +283,12 @@ impl Process {
     /// Tries to allocate memory pages in the target process.
     /// On success returns the address of allocated region.
     #[rustfmt::skip]
-    pub fn virtual_allocate(
+    pub fn allocate(
         &self,
         address: usize,
         size: usize,
         allocation_type: VIRTUAL_ALLOCATION_TYPE,
-        protection: PAGE_PROTECTION_FLAGS,
+        protection: MemoryProtection,
     ) -> crate::Result<usize> {
         unsafe {
             let region = VirtualAllocEx(
@@ -296,7 +296,7 @@ impl Process {
                 address as _,
                 size,
                 allocation_type,
-                protection
+                protection.to_os()
             );
 
             if region.is_null() {
@@ -309,7 +309,7 @@ impl Process {
 
     /// Tries to free memory pages in the target process.
     #[rustfmt::skip]
-    pub fn virtual_free(
+    pub fn free(
         &self,
         address: usize,
         size: usize,
@@ -331,7 +331,7 @@ impl Process {
     }
 
     /// Queries basic information about memory region at `address`.
-    pub fn virtual_query(&self, address: usize) -> crate::Result<MemoryBasicInformation> {
+    pub fn query(&self, address: usize) -> crate::Result<MemoryBasicInformation> {
         unsafe {
             let mut mem_info = zeroed();
             if VirtualQueryEx(self.0, address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {

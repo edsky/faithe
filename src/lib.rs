@@ -56,7 +56,7 @@ pub unsafe fn to_mut_ref<'a, T>(ptr: *const T) -> &'a mut T {
 /// let terminated = unsafe { terminated_array(arr.as_ptr(), &0) };
 /// assert_eq!(terminated, &[1, 2, 3]);
 /// ```
-#[inline(always)]
+#[inline]
 pub unsafe fn terminated_array<T: PartialEq>(mut ptr: *const T, last: &T) -> &[T] {
     let mut len = 0;
     while &*ptr != last {
@@ -77,7 +77,7 @@ pub unsafe fn terminated_array<T: PartialEq>(mut ptr: *const T, last: &T) -> &[T
 /// terminated[1] = 5;
 /// assert_eq!(arr, [1, 5, 3, 0]);
 /// ```
-#[inline(always)]
+#[inline]
 pub unsafe fn terminated_array_mut<T: PartialEq>(mut ptr: *mut T, last: &T) -> &mut [T] {
     let mut len = 0;
     while &*ptr != last || len >= usize::MAX {

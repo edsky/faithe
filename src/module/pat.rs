@@ -38,7 +38,7 @@ impl Iterator for ModulePatIter {
             loop {
                 if let Err(_) = self
                     .proc
-                    .read_process_memory_buf(self.from, &mut self.buf[..])
+                    .read_buf(self.from, &mut self.buf[..])
                 {
                     return None;
                 }
