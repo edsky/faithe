@@ -2,6 +2,7 @@ use std::cell::UnsafeCell;
 
 enum InnerOffset {
     Explicit(usize),
+    // Pattern(&'static str),
     Resolved(usize),
 }
 
@@ -26,12 +27,15 @@ impl RuntimeOffset {
 
     #[inline]
     pub fn resolve(&self, module: &'static str) {
-        let address = crate::internal::get_module_address(module).unwrap() as usize;
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Explicit(offset) => {
-                    *self.0.get() = InnerOffset::Resolved(address + offset);
+                    let base = crate::internal::get_module_address(module).unwrap() as usize;
+                    *self.0.get() = InnerOffset::Resolved(base + offset);
                 }
+                // InnerOffset::Pattern(pattern) => {
+                //     let p = crate::internal::find_pattern(module, Pattern::from_ida_style(pattern)).unwrap();
+                // },
                 InnerOffset::Resolved(_) => unreachable!(),
             }
         }

@@ -42,20 +42,20 @@ process.write_process_memory(0xFF, value)?;
 
 # Allocating / Freeing / Protecting / Querying memory
 ```rust
-use faithe::types::protection_flags::{PAGE_EXECUTE_READWRITE, PAGE_READONLY};
 use faithe::types::allocation_types::{MEM_COMMIT, MEM_RESERVE};
 use faithe::types::free_types::MEM_RELEASE;
+use faithe::memory::MemoryProtection;
 
 let process = get_process();
 let mut chunk = process.virtual_allocate(
     0,
     1000,
     MEM_COMMIT | MEM_RESERVE,
-    PAGE_EXECUTE_READWRITE
+    MemoryProtection::READ_WRITE_EXECUTE
 )?;
 let info = process.virtual_query(chunk)?;
 
-process.virtual_protect(chunk, 1000, PAGE_READONLY)?;
+process.virtual_protect(chunk, 1000, MemoryProtection::Read)?;
 process.virtual_free(chunk, 0, MEM_RELEASE)?;
 ```
 

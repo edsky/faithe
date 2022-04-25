@@ -12,8 +12,12 @@ pub enum FaitheError {
     /// Protection that cannot be represented with internal type.
     #[cfg(all(windows, not(feature = "no-std")))]
     UnknownProtection(u32),
-    /// String is not a valid UTF-8/UTF-16 sequence
-    InvalidString
+    /// String is not a valid UTF-8/UTF-16 sequence.
+    InvalidString,
+    /// Pattern is not an ASCII sequence.
+    NonAsciiPattern,
+    /// Supplied string cannot be parsed as a pattern of given type.
+    InvalidPattern,
 }
 
 pub(crate) type Result<T> = core::result::Result<T, FaitheError>;
