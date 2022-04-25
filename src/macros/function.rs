@@ -1,8 +1,9 @@
+use crate::{FaitheError, pattern::Pattern};
 use std::cell::UnsafeCell;
 
 enum InnerOffset {
     Explicit(usize),
-    // Pattern(&'static str),
+    Pattern(&'static str),
     Resolved(usize),
 }
 
@@ -26,23 +27,32 @@ impl RuntimeOffset {
     }
 
     #[inline]
-    pub fn resolve(&self, module: &'static str) {
+    pub fn try_resolve(&self, module: &'static str) -> crate::Result<()> {
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Explicit(offset) => {
-                    let base = crate::internal::get_module_address(module).unwrap() as usize;
+                    let base = crate::internal::get_module_address(module)? as usize;
                     *self.0.get() = InnerOffset::Resolved(base + offset);
+                    Ok(())
                 }
-                // InnerOffset::Pattern(pattern) => {
-                //     let p = crate::internal::find_pattern(module, Pattern::from_ida_style(pattern)).unwrap();
-                // },
-                InnerOffset::Resolved(_) => unreachable!(),
+                InnerOffset::Pattern(pattern) => {
+                    let addr = crate::internal::find_pattern(module, Pattern::from_ida_style(pattern))?
+                        .ok_or(FaitheError::PatternNotFound)?
+                        .as_ptr() as usize;
+                    *self.0.get() = InnerOffset::Resolved(addr);
+                    Ok(())
+                },
+                InnerOffset::Resolved(_) => Err(FaitheError::AlreadyResolved),
             }
         }
     }
 
     pub const fn explicit(offset: usize) -> Self {
         Self(UnsafeCell::new(InnerOffset::Explicit(offset)))
+    }
+
+    pub const fn pattern(pat: &'static str) -> Self {
+        Self(UnsafeCell::new(InnerOffset::Pattern(pat)))
     }
 }
 
@@ -58,13 +68,13 @@ impl RuntimeOffset {
 macro_rules! function {
     (
         $(
-            $vs:vis extern $name:ident: extern $cc:tt fn($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $lib_name:tt@$offset:tt;
+            $vs:vis $name:ident: $(extern $cc:tt)? fn($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $lib_name:tt$sep:tt$var:tt;
         )*
     ) => {
         $(
             $vs static $name: $name = $name {
                 module: $lib_name,
-                offset: $crate::RuntimeOffset::explicit($offset)
+                offset: $crate::__define_offset!($sep $var)
             };
             $vs struct $name {
                 module: &'static str,
@@ -72,13 +82,24 @@ macro_rules! function {
             }
             unsafe impl ::std::marker::Sync for $name { }
             impl $name {
-                $vs unsafe extern $cc fn call(&self, $($arg_id:$arg_ty),*) $(-> $ret_ty)? {
+                $vs unsafe fn call(&self, $($arg_id:$arg_ty),*) $(-> $ret_ty)? {
                     if !self.offset.is_resolved() {
-                        self.offset.resolve(self.module);
+                        $crate::__expect!(self.offset.try_resolve(self.module), "Failed to resolve function's address");
                     }
-                    ::std::mem::transmute::<_, extern $cc fn($($arg_ty),*) $(-> $ret_ty)?>(self.offset.address())($($arg_id),*);
+                    ::std::mem::transmute::<_, $(extern $cc)? fn($($arg_ty),*) $(-> $ret_ty)?>(self.offset.address())($($arg_id),*);
                 }
             }
         )*
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __define_offset {
+    (# $var:tt) => {
+        $crate::RuntimeOffset::explicit($var)
+    };
+    (@ $var:tt) => {
+        $crate::RuntimeOffset::pattern($var)
     };
 }

@@ -117,7 +117,7 @@ impl Process {
         self.modules()?
             .find(|me| me.sz_module == mod_name.as_ref())
             .ok_or(FaitheError::ModuleNotFound)?
-            .find_first_pattern(pat)
+            .find_first(pat)
     }
 
     /// Reads process's memory at address and returns read value.

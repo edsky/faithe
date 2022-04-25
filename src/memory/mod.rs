@@ -63,8 +63,8 @@ pub fn guard<T>(
     protection: MemoryProtection,
     callback: impl FnOnce() -> T,
 ) -> T {
-    let old = protect(address, size, protection).expect("Failed to protect memory.");
+    let old = crate::__expect!(protect(address, size, protection), "Failed to protect memory.");
     let val = callback();
-    protect(address, size, old).expect("Failed to restore previous protection");
+    crate::__expect!(protect(address, size, old), "Failed to restore previous protection");
     val
 }

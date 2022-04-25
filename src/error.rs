@@ -9,6 +9,8 @@ pub enum FaitheError {
     ProcessNotFound,
     /// No module with selected name were found.
     ModuleNotFound,
+    /// Failed to find selected pattern.
+    PatternNotFound,
     /// Protection that cannot be represented with internal type.
     #[cfg(all(windows, not(feature = "no-std")))]
     UnknownProtection(u32),
@@ -20,6 +22,8 @@ pub enum FaitheError {
     InvalidPattern,
     /// Length of mask is not equal to the length of the pattern.
     PatternMaskMismatch,
+    /// Tried to resolve function pointer twice.
+    AlreadyResolved,
 }
 
 pub(crate) type Result<T> = core::result::Result<T, FaitheError>;

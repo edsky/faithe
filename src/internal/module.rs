@@ -42,8 +42,7 @@ pub fn load_library(lib_name: impl AsRef<str>) -> crate::Result<NonNull<()>> {
     }
 }
 
-/// Returns an address(its handle) of the module.
-/// Always returns Ok(address).
+/// Returns an address(its handle) of the module or Err if failed to find the specified module.
 #[cfg(feature = "nightly")]
 pub fn get_module_address(mod_name: impl AsRef<str>) -> crate::Result<*mut ()> {
     use super::get_peb;
@@ -154,12 +153,12 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
 }
 
 /// Searches module for specific memory pattern.
-pub fn find_pattern(mod_name: impl AsRef<str>, pat: Pattern) -> crate::Result<Option<*mut ()>> {
+pub fn find_pattern(mod_name: impl AsRef<str>, pat: Pattern) -> crate::Result<Option<NonNull<()>>> {
     let info = get_module_information(mod_name)?;
 
     for addr in (info.dll_base as usize)..(info.dll_base as usize + info.image_size) {
         if unsafe { pat.matches(std::slice::from_raw_parts(addr as _, pat.len())) } {
-            return Ok(Some(addr as _));
+            return Ok(NonNull::new(addr as _));
         }
     }
     Ok(None)

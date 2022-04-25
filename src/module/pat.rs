@@ -53,7 +53,7 @@ impl PatternSearcher for ModuleEntry {
     type Output = usize;
     type Iter = ModulePatIter;
 
-    fn find_all_patterns(&self, pat: Pattern) -> crate::Result<Self::Iter> {
+    fn find_all(&self, pat: Pattern) -> crate::Result<Self::Iter> {
         Self::Iter::new(
             self.process_id,
             self.mod_base_addr,

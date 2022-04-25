@@ -9,3 +9,16 @@ cfg_if::cfg_if! {
         pub use function::*;
     }
 }
+
+/// Macro for interal use. Provides functionality to hide panic messages if needed.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __expect {
+    ($var:expr, $msg:expr) => {
+        if cfg!(feature = "no-msgs") {
+            $var.unwrap()
+        } else {
+            $var.expect($msg)
+        }
+    };
+}
