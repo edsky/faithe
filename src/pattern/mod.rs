@@ -74,24 +74,22 @@ impl Pattern {
         if pat.as_ref().is_ascii() {
             Err(FaitheError::NonAsciiPattern)
         } else {
-            Ok(
-                Self(
-                    pat.as_ref()
-                        .split_ascii_whitespace()
-                        .map(|s| {
-                            if s == "?" {
-                                Ok(ByteMatch::Any)
+            Ok(Self(
+                pat.as_ref()
+                    .split_ascii_whitespace()
+                    .map(|s| {
+                        if s == "?" {
+                            Ok(ByteMatch::Any)
+                        } else {
+                            if let Ok(b) = u8::from_str_radix(s, 16) {
+                                Ok(ByteMatch::Exact(b))
                             } else {
-                                if let Ok(b) = u8::from_str_radix(s, 16) {
-                                    Ok(ByteMatch::Exact(b))
-                                } else {
-                                    Err(FaitheError::InvalidPattern)
-                                }
+                                Err(FaitheError::InvalidPattern)
                             }
-                        })
-                        .collect::<crate::Result<Vec<ByteMatch>>>()?
-                )
-            )
+                        }
+                    })
+                    .collect::<crate::Result<Vec<ByteMatch>>>()?,
+            ))
         }
     }
 
@@ -120,6 +118,36 @@ impl Pattern {
         )
     }
 
+    /// Parses PEiD style pattern.
+    /// # Panics
+    /// Panics if pattern of invalid style was supplied or failed to parse a byte.
+    /// ```
+    /// # use faithe::pattern::Pattern;
+    /// let peid_pat = Pattern::from_peid_style("48 89 85 F0 00 00 00 4C 8B ?? ?? ?? ?? ?? 48 8D");
+    /// ```
+    pub fn try_from_peid_style(pat: impl AsRef<str>) -> crate::Result<Self> {
+        if pat.as_ref().is_ascii() {
+            Err(FaitheError::NonAsciiPattern)
+        } else {
+            Ok(Self(
+                pat.as_ref()
+                    .split_ascii_whitespace()
+                    .map(|s| {
+                        if s == "??" {
+                            Ok(ByteMatch::Any)
+                        } else {
+                            if let Ok(b) = u8::from_str_radix(s, 16) {
+                                Ok(ByteMatch::Exact(b))
+                            } else {
+                                Err(FaitheError::InvalidPattern)
+                            }
+                        }
+                    })
+                    .collect::<crate::Result<Vec<ByteMatch>>>()?,
+            ))
+        }
+    }
+
     /// Parses code style pattern.
     /// # Panics
     /// Panics if length os mask is not equal to the length of the pattern.
@@ -145,5 +173,34 @@ impl Pattern {
                 })
                 .collect(),
         )
+    }
+
+    /// Parses code style pattern.
+    /// # Panics
+    /// Panics if length os mask is not equal to the length of the pattern.
+    /// ```
+    /// # use faithe::pattern::Pattern;
+    /// let code_pat = Pattern::from_code_style(
+    ///     b"\x48\x89\x85\xF0\x00\x00\x00\x4C\x8B\x00\x00\x00\x00\x00\x48\x8D",
+    ///     b"xxxxxxxxx?????xx"
+    /// );
+    /// ```
+    pub fn try_from_code_style(pat: &[u8], mask: &[u8]) -> crate::Result<Self> {
+        if pat.len() != mask.len() {
+            Err(FaitheError::PatternMaskMismatch)
+        } else {
+            Ok(Self(
+                pat.iter()
+                    .zip(mask.iter())
+                    .map(|(p, m)| {
+                        if *m == b'?' {
+                            ByteMatch::Any
+                        } else {
+                            ByteMatch::Exact(*p)
+                        }
+                    })
+                    .collect(),
+            ))
+        }
     }
 }

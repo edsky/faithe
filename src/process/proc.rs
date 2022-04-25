@@ -162,11 +162,7 @@ impl Process {
 
     /// Reads process's memory at address and copy `buf.len()` bytes into buffer.
     /// Returns the amount of bytes read.
-    pub fn read_buf(
-        &self,
-        address: usize,
-        mut buf: impl AsMut<[u8]>,
-    ) -> crate::Result<usize> {
+    pub fn read_buf(&self, address: usize, mut buf: impl AsMut<[u8]>) -> crate::Result<usize> {
         unsafe {
             let mut read = 0;
             if ReadProcessMemory(
@@ -233,11 +229,7 @@ impl Process {
 
     /// Writes process's memory at address by copying whole buffer into the target memory.
     /// Returns the amount of bytes written.
-    pub fn write_buf(
-        &self,
-        address: usize,
-        buf: impl AsRef<[u8]>,
-    ) -> crate::Result<usize> {
+    pub fn write_buf(&self, address: usize, buf: impl AsRef<[u8]>) -> crate::Result<usize> {
         unsafe {
             let mut written = 0;
             if WriteProcessMemory(

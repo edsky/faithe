@@ -28,7 +28,8 @@ pub unsafe fn follow_pointer_path<const I: usize, T>(
 /// Reads zero terminated string at `ptr`.
 #[inline]
 pub unsafe fn read_string<'a>(ptr: *const i8) -> crate::Result<&'a str> {
-    core::str::from_utf8(terminated_array(ptr as *const u8, &0)).map_err(|_| FaitheError::InvalidString)
+    core::str::from_utf8(terminated_array(ptr as *const u8, &0))
+        .map_err(|_| FaitheError::InvalidString)
 }
 
 /// Reads zero terminated string at `ptr`.
@@ -40,7 +41,8 @@ pub unsafe fn read_string_unchecked<'a>(ptr: *const i8) -> &'a str {
 /// Reads zero terminated string at `ptr`.
 #[inline]
 pub unsafe fn read_wide_string<'a>(ptr: *const u16) -> crate::Result<alloc::string::String> {
-    alloc::string::String::from_utf16(terminated_array(ptr, &0)).map_err(|_| FaitheError::InvalidString)
+    alloc::string::String::from_utf16(terminated_array(ptr, &0))
+        .map_err(|_| FaitheError::InvalidString)
 }
 
 /// Reads zero terminated string at `ptr`.
@@ -55,7 +57,12 @@ pub unsafe fn read_wide_string_unchecked<'a>(ptr: *const u16) -> alloc::string::
 /// * Can not restore previous protection.
 /// * Previous protection can not be represented with [`MemoryProtection`].
 #[inline]
-pub fn guard<T>(address: *mut (), size: usize, protection: MemoryProtection, callback: impl FnOnce() -> T) -> T {
+pub fn guard<T>(
+    address: *mut (),
+    size: usize,
+    protection: MemoryProtection,
+    callback: impl FnOnce() -> T,
+) -> T {
     let old = protect(address, size, protection).expect("Failed to protect memory.");
     let val = callback();
     protect(address, size, old).expect("Failed to restore previous protection");

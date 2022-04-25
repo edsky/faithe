@@ -18,6 +18,8 @@ pub enum FaitheError {
     NonAsciiPattern,
     /// Supplied string cannot be parsed as a pattern of given type.
     InvalidPattern,
+    /// Length of mask is not equal to the length of the pattern.
+    PatternMaskMismatch,
 }
 
 pub(crate) type Result<T> = core::result::Result<T, FaitheError>;
