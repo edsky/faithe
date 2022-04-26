@@ -15,7 +15,7 @@ macro_rules! interface {
         $(
             $vs:vis trait $name:ident$(($($target:ident),*))? {
                 $(
-                    extern $cc:tt fn $fn_id:ident($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:tt;
+                    extern $cc:tt fn $fn_id:ident($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:expr;
                 )*
             }
         )*

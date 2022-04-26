@@ -1,12 +1,12 @@
-use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
-
 use crate::{pattern::Pattern, FaitheError};
+use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
 use std::cell::UnsafeCell;
 
 mod global;
 mod interface;
 mod sizeof;
 mod strings;
+mod vmt;
 mod xstruct;
 
 cfg_if::cfg_if! {
@@ -96,7 +96,7 @@ impl RuntimeOffset {
                         Mnemonic::Lea | Mnemonic::Mov if asm.op1_kind() == OpKind::Memory => {
                             addr.wrapping_add(asm.memory_displacement64() as usize)
                         }
-                        _ => unimplemented!()
+                        _ => unimplemented!(),
                     };
                     *self.0.get() = InnerOffset::Resolved(end);
                     Ok(())
