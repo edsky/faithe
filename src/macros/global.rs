@@ -2,10 +2,10 @@
 /// ```ignore
 /// global! {
 ///     // Explicitly defined RVA offset relative to `01-hello` module.
-///     extern FUNC: i32 = "01-hello.exe"@0x1234;
+///     extern COUNT: i32 = "01-hello.exe"@0x1234;
 /// }
 /// // On `get` the value of type `i32` will be read at address `base("01-hello.exe") + 0x1234`.
-/// assert_eq!(FUNC.get(), 123);
+/// assert_eq!(COUNT.get(), 123);
 /// ```
 #[macro_export]
 macro_rules! global {

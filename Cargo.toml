@@ -1,6 +1,6 @@
 [package]
 name = "faithe"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 authors = ["sy1ntexx"]
 license = "MIT"
@@ -17,7 +17,7 @@ default-target = "x86_64-pc-windows-msvc"
 targets = ["i686-pc-windows-msvc", "x86_64-pc-windows-msvc"]
 
 [features]
-default = ["nightly", "thiserror", "windows", "external"]
+default = ["nightly", "thiserror", "windows", "external", "iced-x86", "alloc"]
 no-msgs = []
 no-std = []
 alloc = []
@@ -40,6 +40,10 @@ default-features = false
 
 [dependencies.thiserror]
 version = "1.0.0"
+optional = true
+
+[dependencies.iced-x86]
+version = "1.17.0"
 optional = true
 
 [target.'cfg(windows)'.dependencies.windows]

@@ -29,7 +29,7 @@ macro_rules! interface {
                         unsafe {
                             let slot = *(self as *const Self as *const usize) + $idx * core::mem::size_of::<usize>();
                             (*core::mem::transmute::<_, *const extern $cc fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
-                            (self, $($arg_id),*);
+                            (self, $($arg_id),*)
                         }
                     }
                 )*
