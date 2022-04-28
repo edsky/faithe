@@ -34,10 +34,10 @@ process
 # Reading / Writing memory
 ```rust
 let process = get_process();
-let mut value = process.read_process_memory::<u32>(0xFF)?;
+let mut value = process.read::<u32>(0xFF)?;
 value += 100;
 
-process.write_process_memory(0xFF, value)?;
+process.write(0xFF, value)?;
 ```
 
 # Allocating / Freeing / Protecting / Querying memory
@@ -47,16 +47,16 @@ use faithe::types::free_types::MEM_RELEASE;
 use faithe::memory::MemoryProtection;
 
 let process = get_process();
-let mut chunk = process.virtual_allocate(
+let mut chunk = process.allocate(
     0,
     1000,
     MEM_COMMIT | MEM_RESERVE,
     MemoryProtection::READ_WRITE_EXECUTE
 )?;
-let info = process.virtual_query(chunk)?;
+let info = process.query(chunk)?;
 
-process.virtual_protect(chunk, 1000, MemoryProtection::Read)?;
-process.virtual_free(chunk, 0, MEM_RELEASE)?;
+process.protect(chunk, 1000, MemoryProtection::Read)?;
+process.free(chunk, 0, MEM_RELEASE)?;
 ```
 
 # Searching for patterns
@@ -89,21 +89,6 @@ class CPlayer {
     virtual void set_health(int new_value) = 0;
 };
 */
-
-// Creates struct with explicitly defined offsets.
-xstruct! {
-    // STRUCT HAS SIZE OF ZERO.
-    struct Foo {
-        0x0 @ a: u32,
-        0x16 @ b: bool
-    }
-
-    // STRUCT HAS SIZE 20.
-    struct Bar(20) {
-        0x0 @ a: u32,
-        0x16 @ b: bool
-    }
-}
 
 // Creates a function with explicitly defined RVA relative to some module.
 function! {

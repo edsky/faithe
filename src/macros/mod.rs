@@ -7,7 +7,6 @@ mod interface;
 mod sizeof;
 mod strings;
 mod vmt;
-mod xstruct;
 
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "no-std"))] {
