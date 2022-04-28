@@ -70,7 +70,7 @@ impl Pattern {
     /// # use faithe::pattern::Pattern;
     /// let ida_pat = Pattern::from_ida_style("48 89 85 F0 00 00 00 4C 8B ? ? ? ? ? 48 8D");
     /// ```
-    pub fn try_from_id_style(pat: impl AsRef<str>) -> crate::Result<Self> {
+    pub fn try_from_ida_style(pat: impl AsRef<str>) -> crate::Result<Self> {
         if pat.as_ref().is_ascii() {
             Err(FaitheError::NonAsciiPattern)
         } else {
