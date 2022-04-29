@@ -16,9 +16,9 @@
 macro_rules! interface {
     (
         $(
-            $vs:vis trait $name:ident$(($($target:ident),*))? {
+            $vs:vis trait $name:ident$(($($target:ident$(<$($tlf:tt),*>)?),*))? {
                 $(
-                    extern $cc:tt fn $fn_id:ident$(<$($gen:lifetime),*>)?($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:expr;
+                    extern $cc:tt fn $fn_id:ident$(<$($gen:tt),*>)?($($arg_id:ident: $arg_ty:ty),*) $(-> $ret_ty:ty)? = $idx:expr;
                 )*
             }
         )*
@@ -39,7 +39,7 @@ macro_rules! interface {
             }
             $(
                 $(
-                    unsafe impl $name for $target { }
+                    unsafe impl$(<$($tlf),*>)? $name for $target$(<$($tlf),*>)? { }
                 )*
             )?
         )*
