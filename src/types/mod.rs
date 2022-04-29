@@ -45,6 +45,12 @@ impl StrPtr {
     pub const fn new(p: *const u8) -> Self {
         Self(p)
     }
+
+    /// Creates [`StrPtr`] pointing to `0`.
+    #[inline(always)]
+    pub const fn null() -> Self {
+        Self(core::ptr::null())
+    }
 }
 
 /// Creates new StrPtr.
@@ -71,5 +77,11 @@ impl WidePtr {
     #[inline(always)]
     pub fn new(p: *const u16) -> Self {
         Self(p)
+    }
+
+    /// Creates [`WidePtr`] pointing to `0`.
+    #[inline(always)]
+    pub const fn null() -> Self {
+        Self(core::ptr::null())
     }
 }
