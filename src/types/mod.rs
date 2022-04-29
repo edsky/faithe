@@ -28,7 +28,7 @@ impl StrPtr {
     /// # Safety
     /// `StrPtr` must point to valid memory.
     #[inline]
-    pub unsafe fn into_str<'a>(self) -> &'a str {
+    pub unsafe fn to_str<'a>(&self) -> &'a str {
         std::str::from_utf8_unchecked(crate::terminated_array(self.0, &0))
     }
 
@@ -37,7 +37,7 @@ impl StrPtr {
     /// `StrPtr` must point to valid memory.
     #[inline]
     pub unsafe fn into_string(self) -> String {
-        self.into_str().into()
+        self.to_str().into()
     }
 
     /// Creates new [`StrPtr`] from pointer.
