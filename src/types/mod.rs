@@ -42,9 +42,17 @@ impl StrPtr {
 
     /// Creates new [`StrPtr`] from pointer.
     #[inline(always)]
-    pub fn new(p: *const u8) -> Self {
+    pub const fn new(p: *const u8) -> Self {
         Self(p)
     }
+}
+
+/// Creates new StrPtr.
+#[macro_export]
+macro_rules! str_ptr {
+    ($($s:expr),*) => {
+        $crate::types::StrPtr::new(concat! { $($s),*, "\x00" }.as_bytes().as_ptr())
+    };
 }
 
 /// Zero terminated UTF-16 string. Have the same layout as `*const u16`.
