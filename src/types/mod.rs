@@ -61,7 +61,7 @@ impl StrPtr {
 #[macro_export]
 macro_rules! str_ptr {
     ($($s:expr),*) => {
-        $crate::types::StrPtr::new(concat! { $($s),*, "\x00" }.as_bytes().as_ptr())
+        unsafe { $crate::types::StrPtr::new_unchecked(concat! { $($s),*, "\x00" }.as_bytes().as_ptr()) }
     };
 }
 
