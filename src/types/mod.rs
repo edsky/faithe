@@ -56,6 +56,18 @@ impl StrPtr {
     pub fn new(p: *const u8) -> Option<Self> {
         Some(Self(NonNull::new(p as _)?))
     }
+
+    /// Returns the pointer to the string.
+    #[inline(always)]
+    pub fn as_ptr(&self) -> *const u8 {
+        self.0.as_ptr()
+    }
+
+    /// Returns the mutable pointer to the string.
+    #[inline(always)]
+    pub fn as_mut_ptr(&mut self) -> *mut u8 {
+        self.0.as_ptr()
+    }
 }
 
 /// Creates new StrPtr.
@@ -92,5 +104,17 @@ impl WidePtr {
     #[inline(always)]
     pub fn new(p: *const u16) -> Option<Self> {
         Some(Self(NonNull::new(p as _)?))
+    }
+
+    /// Returns the pointer to the string.
+    #[inline(always)]
+    pub fn as_ptr(&self) -> *const u16 {
+        self.0.as_ptr()
+    }
+
+    /// Returns the mutable pointer to the string.
+    #[inline(always)]
+    pub fn as_mut_ptr(&mut self) -> *mut u16 {
+        self.0.as_ptr()
     }
 }
