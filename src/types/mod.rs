@@ -22,7 +22,7 @@ use core::ptr::NonNull;
 
 /// Zero terminated ascii string. Have the same layout as `*const u8`.
 /// Used for convenience so it can be returned from extern funcs.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[repr(transparent)]
 pub struct StrPtr(NonNull<u8>);
 
@@ -80,7 +80,7 @@ macro_rules! str_ptr {
 
 /// Zero terminated UTF-16 string. Have the same layout as `*const u16`.
 /// Used for convenience so it can be returned from extern funcs.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[repr(transparent)]
 pub struct WidePtr(NonNull<u16>);
 impl WidePtr {
