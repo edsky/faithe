@@ -1,7 +1,7 @@
 # Faithe
 Memory hacking library for windows.
 
-# Instalation
+# Installation
 ```toml
 # Latest version
 [dependencies]
