@@ -29,7 +29,7 @@ impl From<THREADENTRY32> for ThreadEntry {
 
 /// Iterator over running threads in the process.
 pub struct Threads {
-    h_snap: HANDLE,
+    snap: HANDLE,
     entry: THREADENTRY32,
     ret: bool,
 }
@@ -38,23 +38,19 @@ impl Threads {
     /// Creates new iterator over threads in process with id `process_id`.
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
-            let h_snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id);
-            if h_snap.is_invalid() {
-                return Err(FaitheError::last_error());
-            }
-
+            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id).map_err(|_| FaitheError::last_error())?;
             let entry = THREADENTRY32 {
                 dwSize: size_of!(THREADENTRY32) as _,
                 ..Default::default()
             };
 
             let mut this = Self {
-                h_snap,
+                snap,
                 entry,
                 ret: true,
             };
 
-            if Thread32First(h_snap, &mut this.entry) == false {
+            if Thread32First(snap, &mut this.entry) == false {
                 Err(FaitheError::last_error())
             } else {
                 Ok(this)
@@ -73,7 +69,7 @@ impl Iterator for Threads {
             let this = self.entry.into();
 
             unsafe {
-                self.ret = Thread32Next(self.h_snap, &mut self.entry) == true;
+                self.ret = Thread32Next(self.snap, &mut self.entry) == true;
             }
 
             Some(this)

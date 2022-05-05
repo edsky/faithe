@@ -4,11 +4,11 @@ use crate::{
     types::{ListEntry, UnicodeString},
     FaitheError,
 };
-use windows::Win32::{
-    Foundation::{HANDLE, HWND, PWSTR},
+use windows::{Win32::{
+    Foundation::{HANDLE, HWND},
     System::{Console, Threading},
     UI::WindowsAndMessaging::{MessageBoxW, MESSAGEBOX_STYLE},
-};
+}, core::PCWSTR};
 
 /// Returns a handle to the current process.
 pub fn get_current_process() -> HANDLE {
@@ -48,13 +48,13 @@ pub fn message_box(
     if unsafe {
         MessageBoxW(
             hwnd,
-            PWSTR(
+            PCWSTR(
                 format!("{}\x00", text.as_ref())
                     .encode_utf16()
                     .collect::<Vec<_>>()
                     .as_mut_ptr(),
             ),
-            PWSTR(
+            PCWSTR(
                 format!("{}\x00", caption.as_ref())
                     .encode_utf16()
                     .collect::<Vec<_>>()

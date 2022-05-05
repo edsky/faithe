@@ -44,7 +44,7 @@ impl From<MODULEENTRY32W> for ModuleEntry {
 
 /// Iterator over process's loaded modules.
 pub struct Modules {
-    h_snap: HANDLE,
+    snap: HANDLE,
     entry: MODULEENTRY32W,
     ret: bool,
 }
@@ -53,12 +53,8 @@ impl Modules {
     /// Creates new iterator over modules of process with id `process_id`
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
-            let h_snap =
-                CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, process_id);
-
-            if h_snap.is_invalid() {
-                return Err(FaitheError::last_error());
-            }
+            let snap =
+                CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, process_id).map_err(|_| FaitheError::last_error())?;
 
             let entry = MODULEENTRY32W {
                 dwSize: size_of::<MODULEENTRY32W>() as _,
@@ -66,12 +62,12 @@ impl Modules {
             };
 
             let mut this = Self {
-                h_snap,
+                snap,
                 entry,
                 ret: true,
             };
 
-            if Module32FirstW(h_snap, &mut this.entry) == false {
+            if Module32FirstW(snap, &mut this.entry) == false {
                 Err(FaitheError::last_error())
             } else {
                 Ok(this)
@@ -90,7 +86,7 @@ impl Iterator for Modules {
             let this = self.entry.into();
 
             unsafe {
-                self.ret = Module32NextW(self.h_snap, &mut self.entry) == true;
+                self.ret = Module32NextW(self.snap, &mut self.entry) == true;
             }
 
             Some(this)

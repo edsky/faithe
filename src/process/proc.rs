@@ -12,7 +12,7 @@ use std::{
     ptr::null,
 };
 use windows::Win32::{
-    Foundation::{CloseHandle, HANDLE, HINSTANCE, PWSTR},
+    Foundation::{CloseHandle, HANDLE, HINSTANCE},
     System::{
         Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory},
         Memory::{
@@ -43,12 +43,9 @@ impl Process {
         desired_access: PROCESS_ACCESS_RIGHTS,
     ) -> crate::Result<Self> {
         unsafe {
-            let handle = OpenProcess(desired_access, inherit_handle, id);
-            if handle.is_invalid() {
-                Err(FaitheError::last_error())
-            } else {
-                Ok(Self(handle))
-            }
+            OpenProcess(desired_access, inherit_handle, id)
+                .map_err(|_| FaitheError::last_error())
+                .map(|v| Self(v))
         }
     }
 
@@ -95,7 +92,7 @@ impl Process {
     pub fn path(&self) -> crate::Result<String> {
         unsafe {
             let mut buf = [0u16; 256];
-            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), PWSTR(&mut buf as _), 256) == 0
+            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), &mut buf) == 0
             {
                 Err(FaitheError::last_error())
             } else {
@@ -342,22 +339,17 @@ impl Process {
         param: *const T,
     ) -> crate::Result<(HANDLE, u32)> {
         unsafe {
-            let mut t_id = 0;
-            let handle = CreateRemoteThread(
+            let mut tid = 0;
+            CreateRemoteThread(
                 self.0,
                 null(),
                 0,
                 mem::transmute(address),
                 param as _,
                 0,
-                &mut t_id,
-            );
-
-            if handle.is_invalid() {
-                Err(FaitheError::last_error())
-            } else {
-                Ok((handle, t_id))
-            }
+                &mut tid,
+            ).map_err(|_| FaitheError::last_error())
+                .map(|v| (v, tid))
         }
     }
 }

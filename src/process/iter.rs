@@ -67,7 +67,7 @@ impl From<PROCESSENTRY32W> for ProcessEntry {
 
 /// Iterator over all running processes.
 pub struct Processes {
-    h_snap: HANDLE,
+    snap: HANDLE,
     entry: PROCESSENTRY32W,
     ret: bool,
 }
@@ -76,18 +76,19 @@ impl Processes {
     /// Creates new iterator over processes
     pub fn new() -> crate::Result<Self> {
         unsafe {
-            let h_snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0).map_err(|_| FaitheError::last_error())?;
+            
             let entry = PROCESSENTRY32W {
                 dwSize: size_of::<PROCESSENTRY32W>() as _,
                 ..Default::default()
             };
 
             let mut this = Self {
-                h_snap,
+                snap,
                 entry,
                 ret: true,
             };
-            if Process32FirstW(this.h_snap, &mut this.entry) == false {
+            if Process32FirstW(this.snap, &mut this.entry) == false {
                 Err(FaitheError::last_error())
             } else {
                 Ok(this)
@@ -106,7 +107,7 @@ impl Iterator for Processes {
             let this = self.entry.into();
 
             unsafe {
-                self.ret = Process32NextW(self.h_snap, &mut self.entry) == true;
+                self.ret = Process32NextW(self.snap, &mut self.entry) == true;
             }
 
             Some(this)

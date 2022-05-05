@@ -25,13 +25,9 @@ impl Thread {
         desired_access: THREAD_ACCESS_RIGHTS,
     ) -> crate::Result<Self> {
         unsafe {
-            let handle = OpenThread(desired_access, inherit_handle, thread_id);
-
-            if handle.is_invalid() {
-                Err(FaitheError::last_error())
-            } else {
-                Ok(Self(handle))
-            }
+            OpenThread(desired_access, inherit_handle, thread_id)
+                .map_err(|_| FaitheError::last_error())
+                .map(|v| Self(v))
         }
     }
 

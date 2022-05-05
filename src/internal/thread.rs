@@ -5,6 +5,8 @@ use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
 type ThreadInit<T> = unsafe extern "system" fn(Option<Box<T>>) -> u32;
 
 /// Creates new thread with default parameters.
+/// # Panics
+/// If failed to create a new thread.
 pub fn create_thread<T>(init: ThreadInit<T>, param: Option<T>) -> u32 {
     unsafe {
         let mut t_id = 0;
@@ -17,7 +19,7 @@ pub fn create_thread<T>(init: ThreadInit<T>, param: Option<T>) -> u32 {
                 .unwrap_or(null_mut()) as _,
             THREAD_CREATION_FLAGS::default(),
             &mut t_id,
-        );
+        ).unwrap();
         t_id
     }
 }

@@ -1,10 +1,9 @@
 use std::ptr::NonNull;
 
 use crate::{pattern::Pattern, FaitheError};
-use windows::Win32::{
-    Foundation::PWSTR,
+use windows::{Win32::{
     System::{LibraryLoader::LoadLibraryW, ProcessStatus::MODULEINFO},
-};
+}, core::PCWSTR};
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]
@@ -33,12 +32,10 @@ pub fn load_library(lib_name: impl AsRef<str>) -> crate::Result<NonNull<()>> {
         let utf16 = format!("{}\x00", lib_name.as_ref())
             .encode_utf16()
             .collect::<Vec<_>>();
-        let lib = LoadLibraryW(PWSTR(utf16.as_ptr()));
-        if lib.is_invalid() {
-            Err(FaitheError::last_error())
-        } else {
-            Ok(NonNull::new_unchecked(lib.0 as _))
-        }
+
+        LoadLibraryW(PCWSTR(utf16.as_ptr()))
+            .map_err(|_| FaitheError::last_error())
+            .map(|v| NonNull::new_unchecked(v.0 as _))
     }
 }
 
