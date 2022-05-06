@@ -9,7 +9,7 @@ use crate::{
 };
 use std::{
     mem::{self, size_of, zeroed},
-    ptr::null,
+    ptr::null, path::Path,
 };
 use windows::Win32::{
     Foundation::{CloseHandle, HANDLE, HINSTANCE},
@@ -351,6 +351,36 @@ impl Process {
             ).map_err(|_| FaitheError::last_error())
                 .map(|v| (v, tid))
         }
+    }
+
+    /// Queries the full path to the module located by the address.
+    pub fn module_path(
+        &self,
+        address: usize,
+    ) -> crate::Result<String>
+    {
+        let mut vec = vec![0; 255];
+        unsafe {
+            let len = K32GetModuleFileNameExW(self.0, HINSTANCE(address as _), &mut vec[..]) as usize;
+            if len == 0 {
+                Err(FaitheError::last_error())
+            } else {
+                Ok(String::from_utf16_lossy(&vec[..len]))
+            }
+        }
+    }
+
+    /// Queries the full path to the module located by the address.
+    /// # Panics
+    /// If the name of the file is not valid UTF-16.
+    pub fn module_name(
+        &self,
+        address: usize,
+    ) -> crate::Result<String>
+    {
+        let path = self.module_path(address)?;
+        let path: &Path = path.as_ref();
+        Ok(path.file_name().unwrap().to_string_lossy().into_owned())
     }
 
     /// Advanced memory querying

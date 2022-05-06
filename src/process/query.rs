@@ -47,11 +47,14 @@ impl<'a> Query<'a> {
 
     /// Returns the start of the next allocated chunk
     #[inline]
-    pub fn boundary(&self, addr: usize) -> usize {
-        if let Ok(mem) = self.0.query_memory(addr) {
-            return mem.alloc_base + mem.region_size;
-        }
-        0
+    pub fn boundary(&self, addr: usize) -> Option<usize> {
+        self.0.query_memory(addr).ok().map(|m| m.alloc_base + m.region_size)
+    }
+    
+    /// Returns the base address of this allocated chunk.
+    #[inline]
+    pub fn base(&self, addr: usize) -> Option<usize> {
+        self.0.query_memory(addr).ok().map(|m| m.alloc_base)
     }
 
     /// Returns the protection of the memory
