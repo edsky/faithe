@@ -45,7 +45,7 @@ macro_rules! interface {
                     unsafe {
                         match name {
                             $(
-                                stringify!( $fn_id ) => {
+                                stringify!($fn_id) => {
                                     (*(self as *const Self as *const &'static [usize; $idx + 1]))[$idx]
                                 }
                             )*
@@ -62,13 +62,33 @@ macro_rules! interface {
                     }
                 }
 
-                /// Dumps the virtual function table until reaches zero slot.
+                /// Dumps the virtual function table by walking vmt pointer until reaches zero slot.
+                #[inline]
                 fn walk_vmt(&self, mut callback: impl core::ops::FnMut(usize, *const ())) {
                     unsafe {
                         let mut i = 0;
                         let mut slot = *(self as *const Self as *const *const usize);
                         while *slot.add(i) != 0 {
                             callback(i, *slot.add(i) as _);
+                            i += 1;
+                        }
+                    }
+                }
+
+                /// Same as `walk_vmt` but calls `callback` only on defined methods.
+                #[inline]
+                fn dump_vmt(&self, mut callback: impl core::ops::FnMut(usize, &'static str, *const ())) {
+                    unsafe {
+                        let mut i = 0;
+                        let mut slot = *(self as *const Self as *const *const usize);
+                        while *slot.add(i) != 0 {
+                            match i {
+                                $(
+                                    $idx => { callback(i, stringify!($fn_id), *slot.add(i) as _) }
+                                )*
+                                _ => {}
+                            }
+
                             i += 1;
                         }
                     }
