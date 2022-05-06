@@ -1,13 +1,17 @@
 # Faithe
 Memory hacking library for windows.
 
+# Warning
+## Unsafe code ahead!
+This library's internals may not mark some frequently used public api methods as `unsafe` although they may cause undefined behavior if used incorrectly. This is especially true for macros.
+
 # Installation
 ```toml
 # Latest version
 [dependencies]
-faithe = "0.7.0"
+faithe = "0.8.0"
 
-# Development version
+# Development, most up-to-date version
 [dependencies.faithe]
 git = "https://github.com/sy1ntexx/faithe"
 ```
@@ -77,13 +81,14 @@ use faithe::{interface, xstruct};
 
 // Creates a trait that will emulate behavior of virtual functions in C++.
 struct CPlayer;
-interface! {
+faithe::interface! {
     trait IEntity(CPlayer) {
         extern "C" fn get_health() -> i32 = 0;
         extern "C" fn set_health(new: i32) = 1;
     }
 }
 /*
+C++ Equivalent
 class CPlayer {
     virtual int get_health() = 0;
     virtual void set_health(int new_value) = 0;
@@ -91,9 +96,13 @@ class CPlayer {
 */
 
 // Creates a function with explicitly defined RVA relative to some module.
-function! {
+faithe::function! {
     // Explicitly defined RVA offset relative to `01-hello` module.
-    extern FUNC: extern "C" fn(a: i32) = "01-hello.exe"@0x1900;
+    FUNC: extern "C" fn(a: i32) = "01-hello.exe"@0x1900;
 }
 FUNC.call(5);
+
+faithe::global! {
+    extern count: i32 = "01-hello.exe"%"8B ? ? ? ? ? 05 AD DE";
+}
 ```

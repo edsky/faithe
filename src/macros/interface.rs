@@ -11,8 +11,8 @@
 ///         extern "C" fn other<'a>(num: &'a i32) -> &'a i32 = 2;
 ///     }
 /// }
-/// // You can use `IInterface::vaddress(obj, "func_name")` to get the address of the function by its name or
-/// // `IInterface::vaddress(obj, <function_index>)` to get the address by the function's index.
+/// // You can use `IInterface::virt_by_address(obj, "func_name")` to get the address of the function by its name or
+/// // `IInterface::virt_by_index(obj, <function_index>)` to get the address by the function's index.
 /// ```
 #[macro_export]
 macro_rules! interface {
