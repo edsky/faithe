@@ -1,4 +1,4 @@
-use super::Processes;
+use super::{Processes, Query};
 use crate::{
     memory::{MemoryBasicInformation, MemoryProtection},
     module::Modules,
@@ -320,7 +320,7 @@ impl Process {
     }
 
     /// Queries basic information about memory region at `address`.
-    pub fn query(&self, address: usize) -> crate::Result<MemoryBasicInformation> {
+    pub fn query_memory(&self, address: usize) -> crate::Result<MemoryBasicInformation> {
         unsafe {
             let mut mem_info = zeroed();
             if VirtualQueryEx(self.0, address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {
@@ -351,6 +351,11 @@ impl Process {
             ).map_err(|_| FaitheError::last_error())
                 .map(|v| (v, tid))
         }
+    }
+
+    /// Advanced memory querying
+    pub fn query(&self) -> Query<'_> {
+        Query(self)
     }
 }
 
