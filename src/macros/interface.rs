@@ -30,12 +30,10 @@ macro_rules! interface {
                 $(
                     #[inline(always)]
                     #[allow(non_snake_case)]
-                    $(extern $($cc)?)? fn $fn_id<'this$(,$($gen),*)?>(&'this self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
-                        unsafe {
-                            let slot = *(self as *const Self as *const usize) + $idx * core::mem::size_of::<usize>();
-                            (*core::mem::transmute::<_, *const $(extern $($cc)?)? fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
-                            (self, $($arg_id),*)
-                        }
+                    unsafe $(extern $($cc)?)? fn $fn_id<'this$(,$($gen),*)?>(&'this self, $($arg_id: $arg_ty),*) $(-> $ret_ty)? {
+                        let slot = *(self as *const Self as *const usize) + $idx * core::mem::size_of::<usize>();
+                        (*core::mem::transmute::<_, *const $(extern $($cc)?)? fn(&Self, $($arg_ty),*) $(-> $ret_ty)?>(slot))
+                        (self, $($arg_id),*)
                     }
                 )*
 
@@ -54,6 +52,16 @@ macro_rules! interface {
                 /// Returns the address of the virtual function by its index.
                 unsafe fn vindex(&self, idx: usize) -> usize {
                     *(*(self as *const Self as *const *const usize)).add(idx)
+                }
+
+                /// Dumps the virtual function table until reaches zero slot.
+                unsafe fn walk_vmt(&self, mut callback: impl core::ops::FnMut(usize, *const ())) {
+                    let mut i = 0;
+                    let mut slot = *(self as *const Self as *const *const usize);
+                    while *slot.add(i) != 0 {
+                        callback(i, *slot.add(i) as _);
+                        i += 1;
+                    }
                 }
             }
             $(
