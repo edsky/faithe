@@ -1,6 +1,6 @@
 /// Creates a virtual method table.
 /// # Behaviour
-/// Each time macro is used, it will create new virtual method table via [`Box::leak`]
+/// Each time macro is used, it will create new virtual method table via [`Box::leak`].
 /// ```
 /// # use faithe::vmt
 /// fn first() {

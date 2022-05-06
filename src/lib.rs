@@ -1,7 +1,6 @@
 #![cfg_attr(feature = "no-std", no_std)]
 #![warn(missing_docs)]
-//! # Faithe
-//! Useful stuff for memory hacking in windows.
+#![doc = include_str!("../README.md")]
 
 /// APIs for internal interation with current process.
 #[cfg(not(feature = "no-std"))]
