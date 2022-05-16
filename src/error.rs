@@ -9,6 +9,8 @@ pub enum FaitheError {
     ProcessNotFound,
     /// No module with selected name were found.
     ModuleNotFound,
+    /// Memory query failed
+    QueryFailed,
     /// Failed to find selected pattern.
     PatternNotFound,
     /// Protection that cannot be represented with internal type.

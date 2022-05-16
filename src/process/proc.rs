@@ -19,7 +19,7 @@ use windows::Win32::{
             VirtualAllocEx, VirtualFreeEx, VirtualProtectEx, VirtualQueryEx,
             VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
         },
-        ProcessStatus::K32GetModuleFileNameExW,
+        ProcessStatus::{K32GetModuleFileNameExW, K32GetProcessImageFileNameW},
         Threading::{CreateRemoteThread, GetProcessId, OpenProcess, PROCESS_ACCESS_RIGHTS},
     },
 };
@@ -81,11 +81,28 @@ impl Process {
         unsafe { GetProcessId(self.0) }
     }
 
+    /// Retrieves process's image file name.
+    /// # Panics
+    /// If failed to get process's name (GetProcessImageFileNameW).
+    pub fn image_name(&self) -> Option<String> {
+        let mut buf = [0; 255];
+        unsafe {
+            let len = K32GetProcessImageFileNameW(self.0, &mut buf);
+            assert!(len > 0, "Failed to get process's image file name");
+            Some(String::from_utf16_lossy(&buf[..len as usize]).rsplit_once('\\')?.1.to_string())
+        }
+    }
+
     /// Returns the handle to the process.
     /// # Safety
     /// Do not close it and you will be alright.
     pub unsafe fn handle(&self) -> HANDLE {
         self.0
+    }
+
+    /// Gets module that contains selected address
+    pub fn address_module(&self, address: usize) -> crate::Result<String> {
+        self.module_name(self.query().base(address).ok_or(FaitheError::QueryFailed)?)
     }
 
     /// Retrieves full path to process's executable.
@@ -138,21 +155,20 @@ impl Process {
     }
 
     /// Reads process's memory at address and returns read value and amount of bytes read.
-    pub fn read_ext<T>(&self, address: usize) -> crate::Result<(T, usize)> {
+    pub fn read_ext<T>(&self, address: usize, read: &mut usize) -> crate::Result<T> {
         unsafe {
             let mut buf = zeroed();
-            let mut read = 0;
             if ReadProcessMemory(
                 self.0,
                 address as _,
                 &mut buf as *mut T as _,
                 size_of::<T>(),
-                &mut read,
+                read,
             ) == false
             {
                 Err(FaitheError::last_error())
             } else {
-                Ok((buf, read))
+                Ok(buf)
             }
         }
     }
