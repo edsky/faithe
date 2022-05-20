@@ -1,4 +1,4 @@
-use crate::{module::Modules, thread::Threads, FaitheError};
+use crate::{module::ModuleIterator, thread::Threads, FaitheError};
 use std::mem::size_of;
 use windows::Win32::{
     Foundation::HANDLE,
@@ -10,7 +10,6 @@ use windows::Win32::{
         Threading::PROCESS_ACCESS_RIGHTS,
     },
 };
-
 use super::Process;
 
 /// Basic information about single process.
@@ -21,17 +20,17 @@ pub struct ProcessEntry {
     /// Number of running threads in the process.
     pub cnt_threads: u32,
     /// Id of parent process.
-    pub parent_process_id: u32,
+    pub parent_id: u32,
     /// Thread priority for any newly created thread.
     pub thread_base_priority: i32,
     /// Name of an executable file.
-    pub sz_exe_file: String,
+    pub file_name: String,
 }
 
 impl ProcessEntry {
     /// Returns an iterator over loaded modules in the process.
-    pub fn modules(&self) -> crate::Result<Modules> {
-        Modules::new(self.process_id)
+    pub fn modules(&self) -> crate::Result<ModuleIterator> {
+        ModuleIterator::new(self.process_id)
     }
 
     /// Returns an iterator over running threads in the process.
@@ -56,9 +55,9 @@ impl From<PROCESSENTRY32W> for ProcessEntry {
         Self {
             process_id: pe.th32ProcessID,
             cnt_threads: pe.cntThreads,
-            parent_process_id: pe.th32ParentProcessID,
+            parent_id: pe.th32ParentProcessID,
             thread_base_priority: pe.pcPriClassBase,
-            sz_exe_file: String::from_utf16_lossy(
+            file_name: String::from_utf16_lossy(
                 &pe.szExeFile[..pe.szExeFile.iter().position(|v| *v == 0).unwrap_or(0)],
             ),
         }
@@ -66,13 +65,13 @@ impl From<PROCESSENTRY32W> for ProcessEntry {
 }
 
 /// Iterator over all running processes.
-pub struct Processes {
+pub struct ProcessIterator {
     snap: HANDLE,
     entry: PROCESSENTRY32W,
     ret: bool,
 }
 
-impl Processes {
+impl ProcessIterator {
     /// Creates new iterator over processes
     pub fn new() -> crate::Result<Self> {
         unsafe {
@@ -97,7 +96,7 @@ impl Processes {
     }
 }
 
-impl Iterator for Processes {
+impl Iterator for ProcessIterator {
     type Item = ProcessEntry;
 
     fn next(&mut self) -> Option<Self::Item> {

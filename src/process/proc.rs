@@ -1,7 +1,7 @@
-use super::{Processes, Query};
+use super::{ProcessIterator, Query};
 use crate::{
     memory::{MemoryBasicInformation, MemoryProtection},
-    module::Modules,
+    module::ModuleIterator,
     pattern::{Pattern, PatternSearcher},
     size_of,
     thread::Threads,
@@ -55,9 +55,9 @@ impl Process {
         inherit_handle: bool,
         desired_access: PROCESS_ACCESS_RIGHTS,
     ) -> crate::Result<Self> {
-        Processes::new()?
+        ProcessIterator::new()?
             .find_map(|pe| {
-                if pe.sz_exe_file == name.as_ref() {
+                if pe.file_name == name.as_ref() {
                     Some(pe.open(inherit_handle, desired_access))
                 } else {
                     None
@@ -67,8 +67,8 @@ impl Process {
     }
 
     /// Returns an iterator over all modules in the process.
-    pub fn modules(&self) -> crate::Result<Modules> {
-        Modules::new(self.id())
+    pub fn modules(&self) -> crate::Result<ModuleIterator> {
+        ModuleIterator::new(self.id())
     }
 
     /// Returns an iterator over running threads in the process.
@@ -129,7 +129,7 @@ impl Process {
         pat: Pattern,
     ) -> crate::Result<Option<usize>> {
         self.modules()?
-            .find(|me| me.sz_module == mod_name.as_ref())
+            .find(|me| me.name == mod_name.as_ref())
             .ok_or(FaitheError::ModuleNotFound)?
             .find_first(pat)
     }

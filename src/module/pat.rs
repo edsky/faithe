@@ -56,8 +56,8 @@ impl PatternSearcher for ModuleEntry {
     fn find_all(&self, pat: Pattern) -> crate::Result<Self::Iter> {
         Self::Iter::new(
             self.process_id,
-            self.mod_base_addr,
-            self.mod_base_addr + self.mod_base_size,
+            self.base_address,
+            self.base_address + self.size,
             pat,
         )
     }

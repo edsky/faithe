@@ -14,28 +14,28 @@ pub struct ModuleEntry {
     /// Id of the process.
     pub process_id: u32,
     /// Base address of the module.
-    pub mod_base_addr: usize,
+    pub base_address: usize,
     /// Size of the module in bytes.
-    pub mod_base_size: usize,
+    pub size: usize,
     /// Handle to the module.
-    pub h_module: HINSTANCE,
+    pub handle: HINSTANCE,
     /// Name of the module.
-    pub sz_module: String,
+    pub name: String,
     /// Full path to the module.
-    pub sz_exe_path: String,
+    pub path: String,
 }
 
 impl From<MODULEENTRY32W> for ModuleEntry {
     fn from(me: MODULEENTRY32W) -> Self {
         Self {
             process_id: me.th32ProcessID,
-            mod_base_addr: me.modBaseAddr as _,
-            mod_base_size: me.modBaseSize as _,
-            h_module: me.hModule,
-            sz_module: String::from_utf16_lossy(
+            base_address: me.modBaseAddr as _,
+            size: me.modBaseSize as _,
+            handle: me.hModule,
+            name: String::from_utf16_lossy(
                 &me.szModule[..me.szModule.iter().position(|b| *b == 0).unwrap_or(0)],
             ),
-            sz_exe_path: String::from_utf16_lossy(
+            path: String::from_utf16_lossy(
                 &me.szExePath[..me.szExePath.iter().position(|b| *b == 0).unwrap_or(0)],
             ),
         }
@@ -43,13 +43,13 @@ impl From<MODULEENTRY32W> for ModuleEntry {
 }
 
 /// Iterator over process's loaded modules.
-pub struct Modules {
+pub struct ModuleIterator {
     snap: HANDLE,
     entry: MODULEENTRY32W,
     ret: bool,
 }
 
-impl Modules {
+impl ModuleIterator {
     /// Creates new iterator over modules of process with id `process_id`
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
@@ -76,7 +76,7 @@ impl Modules {
     }
 }
 
-impl Iterator for Modules {
+impl Iterator for ModuleIterator {
     type Item = ModuleEntry;
 
     fn next(&mut self) -> Option<Self::Item> {
