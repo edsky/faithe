@@ -1,4 +1,4 @@
-use super::{ProcessIterator, Query};
+use super::{ProcessIterator, Query, MemoryRegionIter, MemoryRegion};
 use crate::{
     memory::{MemoryBasicInformation, MemoryProtection},
     module::ModuleIterator,
@@ -91,6 +91,12 @@ impl Process {
             assert!(len > 0, "Failed to get process's image file name");
             Some(String::from_utf16_lossy(&buf[..len as usize]).rsplit_once('\\')?.1.to_string())
         }
+    }
+
+    // @TODO: Fix iterator sometimes missing some memory regions??
+    /// Returns an itertor over process's allocated memory pages
+    pub fn regions(&self) -> impl Iterator<Item = MemoryRegion> + '_ {
+        MemoryRegionIter::new(self)
     }
 
     /// Returns the handle to the process.
