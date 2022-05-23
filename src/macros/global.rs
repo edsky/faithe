@@ -17,7 +17,7 @@ macro_rules! global {
     ) => {
         $(
             #[allow(non_upper_case_globals)]
-            $vs static $name: $name = $name {
+            $vs static mut $name: $name = $name {
                 offset: $crate::__define_offset!($sep $var)
             };
             #[allow(non_camel_case_types)]
@@ -47,6 +47,20 @@ macro_rules! global {
                     }
 
                     (self.offset.address() as *mut $fty).as_mut().unwrap()
+                }
+            }
+
+            impl ::core::ops::Deref for $name {
+                type Target = $fty;
+
+                fn deref(&self) -> &Self::Target {
+                    unsafe { self.get_ref() }
+                }
+            }
+
+            impl ::core::ops::DerefMut for $name {
+                fn deref_mut(&mut self) -> &mut Self::Target {
+                    unsafe { self.get_mut() }
                 }
             }
 
