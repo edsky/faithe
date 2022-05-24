@@ -49,32 +49,6 @@ macro_rules! global {
                     (self.offset.address() as *mut $fty).as_mut().unwrap()
                 }
             }
-
-            impl ::core::ops::Deref for $name {
-                type Target = $fty;
-
-                fn deref(&self) -> &Self::Target {
-                    unsafe { self.get_ref() }
-                }
-            }
-
-            impl ::core::ops::DerefMut for $name {
-                fn deref_mut(&mut self) -> &mut Self::Target {
-                    unsafe { self.get_mut() }
-                }
-            }
-
-            impl ::core::convert::AsRef<$fty> for $name {
-                fn as_ref(&self) -> &$fty {
-                    unsafe { self.get_ref() }
-                }
-            }
-
-            impl ::core::convert::AsMut<$fty> for $name {
-                fn as_mut(&mut self) -> &mut $fty {
-                    unsafe { self.get_mut() }
-                }
-            }
         )*
     };
 }
