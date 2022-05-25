@@ -30,7 +30,7 @@ macro_rules! function {
                         if !self.offset.is_resolved() {
                             $crate::__expect!(self.offset.try_resolve($lib_name, $crate::__define_offset2!($($add)?)), "Failed to resolve function's address");
                         }
-                        ::core::mem::transmute::<_, $(extern $($cc)?)? fn($($arg_ty),*) $(-> $ret_ty)?>(self.offset.address())($($arg_id),*);
+                        ::core::mem::transmute::<_, $(extern $($cc)?)? fn($($arg_ty),*) $(-> $ret_ty)?>(self.offset.address())($($arg_id),*)
                     }
                 }
             }
