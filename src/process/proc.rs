@@ -111,6 +111,19 @@ impl Process {
         self.module_name(self.query().base(address).ok_or(FaitheError::QueryFailed)?)
     }
 
+    /// Folows offsets' path, returning a pointer to an offset after.
+    pub fn follow_offset_path(&self, mut base: usize, offsets: &[usize]) -> crate::Result<usize> {
+        for (i, offset) in offsets.iter().copied().enumerate() {
+            if i == offsets.len() - 1 {
+                return Ok(base + offset);
+            }
+
+            base = self.read(base + offset)?;
+        }
+
+        unreachable!()
+    }
+
     /// Retrieves full path to process's executable.
     pub fn path(&self) -> crate::Result<String> {
         unsafe {
