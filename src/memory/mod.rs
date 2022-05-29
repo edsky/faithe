@@ -6,7 +6,7 @@ pub use info::*;
 mod protection;
 pub use protection::*;
 
-use crate::{internal::protect, terminated_array, FaitheError};
+use crate::{terminated_array, FaitheError};
 
 /// Resolves multilevel pointer.
 /// # Behavior
@@ -57,6 +57,7 @@ pub unsafe fn read_wide_string_unchecked<'a>(ptr: *const u16) -> alloc::string::
 /// * Can not restore previous protection.
 /// * Previous protection can not be represented with [`MemoryProtection`].
 #[inline]
+#[cfg(not(feature = "no-std"))]
 pub fn guard<T>(
     address: *mut (),
     size: usize,
@@ -64,12 +65,12 @@ pub fn guard<T>(
     callback: impl FnOnce() -> T,
 ) -> T {
     let old = crate::__expect!(
-        protect(address, size, protection),
+        crate::internal::protect(address, size, protection),
         "Failed to protect memory."
     );
     let val = callback();
     crate::__expect!(
-        protect(address, size, old),
+        crate::internal::protect(address, size, old),
         "Failed to restore previous protection"
     );
     val

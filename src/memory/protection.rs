@@ -36,6 +36,7 @@ impl MemoryProtection {
     /// - `rw-` => PAGE_READWRITE,
     /// - `rwx` => PAGE_EXECUTE_READWRITE,
     #[cfg(windows)]
+    #[cfg(not(feature = "no-std"))]
     pub fn to_os(&self) -> windows::Win32::System::Memory::PAGE_PROTECTION_FLAGS {
         use windows::Win32::System::Memory::{
             PAGE_EXECUTE, PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE, PAGE_EXECUTE_WRITECOPY,
@@ -71,6 +72,7 @@ impl MemoryProtection {
     /// For conversions see [`Self::to_os`].
     /// For any other protection `None` is returned.
     #[cfg(windows)]
+    #[cfg(not(feature = "no-std"))]
     pub fn from_os(prot: windows::Win32::System::Memory::PAGE_PROTECTION_FLAGS) -> Option<Self> {
         use windows::Win32::System::Memory::{
             PAGE_EXECUTE, PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE, PAGE_EXECUTE_WRITECOPY,

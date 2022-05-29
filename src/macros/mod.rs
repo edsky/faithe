@@ -1,7 +1,3 @@
-use crate::{pattern::Pattern, FaitheError};
-use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
-use std::cell::UnsafeCell;
-
 mod global;
 mod interface;
 mod sizeof;
@@ -28,6 +24,7 @@ macro_rules! __expect {
     };
 }
 
+#[cfg(not(feature = "no-std"))]
 enum InnerOffset {
     Explicit(usize),
     Pattern(&'static str),
@@ -36,9 +33,13 @@ enum InnerOffset {
     Resolved(usize),
 }
 
+
 #[doc(hidden)]
-pub struct RuntimeOffset(UnsafeCell<InnerOffset>);
+#[cfg(not(feature = "no-std"))]
+pub struct RuntimeOffset(core::cell::UnsafeCell<InnerOffset>);
+#[cfg(not(feature = "no-std"))]
 impl RuntimeOffset {
+
     #[inline(always)]
     pub fn address(&self) -> usize {
         unsafe {
@@ -56,6 +57,10 @@ impl RuntimeOffset {
 
     #[inline]
     pub fn try_resolve(&self, module: &'static str, add: usize) -> crate::Result<()> {
+        use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
+        use crate::pattern::Pattern;
+        use crate::FaitheError;
+
         unsafe {
             match *(self.0.get()) {
                 InnerOffset::Explicit(offset) => {
@@ -106,15 +111,15 @@ impl RuntimeOffset {
     }
 
     pub const fn explicit(offset: usize) -> Self {
-        Self(UnsafeCell::new(InnerOffset::Explicit(offset)))
+        Self(core::cell::UnsafeCell::new(InnerOffset::Explicit(offset)))
     }
 
     pub const fn pattern(pat: &'static str) -> Self {
-        Self(UnsafeCell::new(InnerOffset::Pattern(pat)))
+        Self(core::cell::UnsafeCell::new(InnerOffset::Pattern(pat)))
     }
 
     pub const fn smart(pat: &'static str) -> Self {
-        Self(UnsafeCell::new(InnerOffset::Smart(pat)))
+        Self(core::cell::UnsafeCell::new(InnerOffset::Smart(pat)))
     }
 }
 
