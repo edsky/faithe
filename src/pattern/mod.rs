@@ -212,7 +212,7 @@ impl Pattern {
     pub unsafe fn find_all(&self, from: *const u8, to: *const u8) -> impl Iterator<Item = *const u8> + '_ {
         assert!(to as usize >= from as usize);
 
-        std::slice::from_raw_parts(from, to.offset_from(from) as usize)
+        core::slice::from_raw_parts(from, to.offset_from(from) as usize)
             .windows(self.len())
             .enumerate()
             .filter(|(_, w)| self.matches(*w))
