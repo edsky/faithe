@@ -6,13 +6,17 @@ use crate::{
 };
 use windows::{Win32::{
     Foundation::{HANDLE, HWND},
-    System::{Console, Threading},
+    System::{Console, Threading, LibraryLoader::GetModuleHandleA},
     UI::WindowsAndMessaging::{MessageBoxW, MESSAGEBOX_STYLE},
 }, core::PCWSTR};
 
 /// Returns a handle to the current process.
-pub fn get_current_process() -> HANDLE {
+pub const fn get_current_process() -> HANDLE {
     HANDLE(usize::MAX as isize)
+}
+
+pub fn get_current_module() -> HANDLE {
+    unsafe { HANDLE(GetModuleHandleA(None).unwrap_or_default().0) }
 }
 
 /// Returns the id of the current process.
