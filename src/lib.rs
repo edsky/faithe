@@ -47,6 +47,7 @@ pub unsafe fn to_mut_ref<'a, T>(ptr: *const T) -> &'a mut T {
 }
 
 /// Creates an immutable slice from the terminated array by finding it's last element. Returns a slice **NOT INCLUDING** the last element.
+/// Maximum length is `usize::MAX`
 /// # Safety
 /// `ptr` must be valid, properly alligned.
 /// ```
@@ -66,6 +67,7 @@ pub unsafe fn terminated_array<T: PartialEq>(mut ptr: *const T, last: &T) -> &[T
 }
 
 /// Creates a mutable slice from the terminated array by finding it's last element. Returns a slice **NOT INCLUDING** the last element.
+/// Maximum length is `usize::MAX`
 /// # Safety
 /// `ptr` must be valid, properly alligned.
 /// ```
@@ -84,6 +86,44 @@ pub unsafe fn terminated_array_mut<T: PartialEq>(mut ptr: *mut T, last: &T) -> &
         len += 1;
     }
     core::slice::from_raw_parts_mut(ptr.sub(len), len)
+}
+
+/// Creates an immutable slice from the terminated slice by finding it's last element. Returns a slice **NOT INCLUDING** the last element.
+/// Returns an empty slice if failed to find the last element.
+/// # Safety
+/// `ptr` must be valid, properly alligned.
+/// ```
+/// # use faithe::terminated_slice;
+/// let arr: [u8; 4] = [1, 2, 3, 0];
+/// let terminated = terminated_slice(&arr, &0);
+/// assert_eq!(terminated, &[1, 2, 3]);
+/// ```
+pub fn terminated_slice<'a, T: PartialEq>(slice: &'a [T], last: &T) -> &'a [T] {
+    if let Some(i) = slice.iter().position(|i| i == last) {
+        &slice[..i]
+    } else {
+        &[]
+    }
+}
+
+/// Creates a mutable slice from the terminated slice by finding it's last element. Returns a slice **NOT INCLUDING** the last element.
+/// Returns an empty slice if failed to find the last element.
+/// # Safety
+/// `ptr` must be valid, properly alligned.
+/// ```
+/// # use faithe::terminated_slice_mut;
+/// let mut arr: [u8; 4] = [1, 2, 3, 0];
+/// let terminated = terminated_slice_mut(&mut arr, &0);
+/// assert_eq!(terminated, &[1, 2, 3]);
+/// terminated[1] = 4;
+/// assert_eq!(terminated, &[1, 4, 3]);
+/// ```
+pub fn terminated_slice_mut<'a, T: PartialEq>(slice: &'a mut [T], last: &T) -> &'a mut [T] {
+    if let Some(i) = slice.iter().position(|i| i == last) {
+        &mut slice[..i]
+    } else {
+        &mut []
+    }
 }
 
 pub use memoffset::offset_of;
