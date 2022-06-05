@@ -1,3 +1,4 @@
+use super::Process;
 use crate::{module::ModuleIterator, thread::Threads, FaitheError};
 use std::mem::size_of;
 use windows::Win32::{
@@ -10,7 +11,6 @@ use windows::Win32::{
         Threading::PROCESS_ACCESS_RIGHTS,
     },
 };
-use super::Process;
 
 /// Basic information about single process.
 #[derive(Debug, Clone)]
@@ -75,8 +75,9 @@ impl ProcessIterator {
     /// Creates new iterator over processes
     pub fn new() -> crate::Result<Self> {
         unsafe {
-            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0).map_err(|_| FaitheError::last_error())?;
-            
+            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+                .map_err(|_| FaitheError::last_error())?;
+
             let entry = PROCESSENTRY32W {
                 dwSize: size_of::<PROCESSENTRY32W>() as _,
                 ..Default::default()

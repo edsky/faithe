@@ -54,7 +54,8 @@ impl ModuleIterator {
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
             let snap =
-                CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, process_id).map_err(|_| FaitheError::last_error())?;
+                CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, process_id)
+                    .map_err(|_| FaitheError::last_error())?;
 
             let entry = MODULEENTRY32W {
                 dwSize: size_of::<MODULEENTRY32W>() as _,

@@ -19,7 +19,8 @@ pub fn create_thread<T>(init: ThreadInit<T>, param: Option<T>) -> u32 {
                 .unwrap_or(null_mut()) as _,
             THREAD_CREATION_FLAGS::default(),
             &mut t_id,
-        ).unwrap();
+        )
+        .unwrap();
         t_id
     }
 }

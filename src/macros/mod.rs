@@ -33,13 +33,11 @@ enum InnerOffset {
     Resolved(usize),
 }
 
-
 #[doc(hidden)]
 #[cfg(not(feature = "no-std"))]
 pub struct RuntimeOffset(core::cell::UnsafeCell<InnerOffset>);
 #[cfg(not(feature = "no-std"))]
 impl RuntimeOffset {
-
     #[inline(always)]
     pub fn address(&self) -> usize {
         unsafe {
@@ -57,9 +55,9 @@ impl RuntimeOffset {
 
     #[inline]
     pub fn try_resolve(&self, module: &'static str, add: usize) -> crate::Result<()> {
-        use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
         use crate::pattern::Pattern;
         use crate::FaitheError;
+        use iced_x86::{Decoder, DecoderOptions, Mnemonic, OpKind};
 
         unsafe {
             match *(self.0.get()) {

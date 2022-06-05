@@ -1,9 +1,10 @@
 use std::ptr::NonNull;
 
 use crate::{pattern::Pattern, FaitheError};
-use windows::{Win32::{
-    System::{LibraryLoader::LoadLibraryW, ProcessStatus::MODULEINFO},
-}, core::PCWSTR};
+use windows::{
+    core::PCWSTR,
+    Win32::System::{LibraryLoader::LoadLibraryW, ProcessStatus::MODULEINFO},
+};
 
 /// Basic information about process's module.
 #[derive(Debug, Clone)]

@@ -1,15 +1,16 @@
-use super::{ProcessIterator, Query, MemoryRegionIter, MemoryRegion};
+use super::{MemoryRegion, MemoryRegionIter, ProcessIterator, Query};
 use crate::{
-    memory::{MemoryBasicInformation, MemoryProtection},
     module::ModuleIterator,
     pattern::{Pattern, PatternSearcher},
     size_of,
     thread::Threads,
+    types::{MemoryBasicInformation, MemoryProtection},
     FaitheError,
 };
 use std::{
     mem::{self, size_of, zeroed},
-    ptr::null, path::Path,
+    path::Path,
+    ptr::null,
 };
 use windows::Win32::{
     Foundation::{CloseHandle, HANDLE, HINSTANCE},
@@ -89,7 +90,12 @@ impl Process {
         unsafe {
             let len = K32GetProcessImageFileNameW(self.0, &mut buf);
             assert!(len > 0, "Failed to get process's image file name");
-            Some(String::from_utf16_lossy(&buf[..len as usize]).rsplit_once('\\')?.1.to_string())
+            Some(
+                String::from_utf16_lossy(&buf[..len as usize])
+                    .rsplit_once('\\')?
+                    .1
+                    .to_string(),
+            )
         }
     }
 
@@ -112,7 +118,7 @@ impl Process {
     }
 
     /// Folows offsets' path, returning a pointer to an offset after.
-    pub fn follow_offset_path(&self, mut base: usize, offsets: &[usize]) -> crate::Result<usize> {
+    pub fn follow_pointer_path(&self, mut base: usize, offsets: &[usize]) -> crate::Result<usize> {
         for (i, offset) in offsets.iter().copied().enumerate() {
             if i == offsets.len() - 1 {
                 return Ok(base + offset);
@@ -128,8 +134,7 @@ impl Process {
     pub fn path(&self) -> crate::Result<String> {
         unsafe {
             let mut buf = [0u16; 256];
-            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), &mut buf) == 0
-            {
+            if K32GetModuleFileNameExW(self.0, HINSTANCE::default(), &mut buf) == 0 {
                 Err(FaitheError::last_error())
             } else {
                 Ok(String::from_utf16_lossy(
@@ -383,20 +388,18 @@ impl Process {
                 param as _,
                 0,
                 &mut tid,
-            ).map_err(|_| FaitheError::last_error())
-                .map(|v| (v, tid))
+            )
+            .map_err(|_| FaitheError::last_error())
+            .map(|v| (v, tid))
         }
     }
 
     /// Queries the full path to the module located by the address.
-    pub fn module_path(
-        &self,
-        address: usize,
-    ) -> crate::Result<String>
-    {
+    pub fn module_path(&self, address: usize) -> crate::Result<String> {
         let mut vec = vec![0; 255];
         unsafe {
-            let len = K32GetModuleFileNameExW(self.0, HINSTANCE(address as _), &mut vec[..]) as usize;
+            let len =
+                K32GetModuleFileNameExW(self.0, HINSTANCE(address as _), &mut vec[..]) as usize;
             if len == 0 {
                 Err(FaitheError::last_error())
             } else {
@@ -408,18 +411,14 @@ impl Process {
     /// Queries the full path to the module located by the address.
     /// # Panics
     /// If the name of the file is not valid UTF-16.
-    pub fn module_name(
-        &self,
-        address: usize,
-    ) -> crate::Result<String>
-    {
+    pub fn module_name(&self, address: usize) -> crate::Result<String> {
         let path = self.module_path(address)?;
         let path: &Path = path.as_ref();
         Ok(path.file_name().unwrap().to_string_lossy().into_owned())
     }
 
     /// Advanced memory querying
-    pub fn query(&self) -> Query<'_> {
+    pub fn query(&self) -> Query {
         Query(self)
     }
 }

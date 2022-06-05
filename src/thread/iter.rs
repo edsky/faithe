@@ -38,7 +38,8 @@ impl Threads {
     /// Creates new iterator over threads in process with id `process_id`.
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
-            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id).map_err(|_| FaitheError::last_error())?;
+            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id)
+                .map_err(|_| FaitheError::last_error())?;
             let entry = THREADENTRY32 {
                 dwSize: size_of!(THREADENTRY32) as _,
                 ..Default::default()

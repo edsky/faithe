@@ -5,17 +5,17 @@
 /// APIs for internal interation with current process.
 #[cfg(not(feature = "no-std"))]
 pub mod internal;
-/// Useful memory APIs.
-pub mod memory;
-#[cfg(feature = "external")]
-/// Module for dealing with processs' modules.
-pub mod module;
-#[cfg(feature = "external")]
-/// Module for doing common things with processes.
-pub mod process;
-#[cfg(feature = "external")]
-/// Iterator over threads and etc.
-pub mod thread;
+
+cfg_if::cfg_if! {
+    if #[cfg(all(feature = "external", not(feature = "no-std")))] {
+        /// Iterator over threads and etc.
+        pub mod thread;
+        /// Module for doing common things with processes.
+        pub mod process;
+        /// Module for dealing with processs' modules.
+        pub mod module;
+    }
+}
 
 #[cfg(any(not(feature = "no-std"), feature = "alloc"))]
 /// Pattern searching.
@@ -57,9 +57,9 @@ pub unsafe fn to_mut_ref<'a, T>(ptr: *const T) -> &'a mut T {
 /// assert_eq!(terminated, &[1, 2, 3]);
 /// ```
 #[inline]
-pub unsafe fn terminated_array<T: PartialEq>(mut ptr: *const T, last: &T) -> &[T] {
+pub unsafe fn terminated_array<'a, T: PartialEq>(mut ptr: *const T, last: T) -> &'a [T] {
     let mut len = 0;
-    while &*ptr != last {
+    while &*ptr != &last {
         ptr = ptr.add(1);
         len += 1;
     }
@@ -79,9 +79,9 @@ pub unsafe fn terminated_array<T: PartialEq>(mut ptr: *const T, last: &T) -> &[T
 /// assert_eq!(arr, [1, 5, 3, 0]);
 /// ```
 #[inline]
-pub unsafe fn terminated_array_mut<T: PartialEq>(mut ptr: *mut T, last: &T) -> &mut [T] {
+pub unsafe fn terminated_array_mut<'a, T: PartialEq>(mut ptr: *mut T, last: T) -> &'a mut [T] {
     let mut len = 0;
-    while &*ptr != last || len >= usize::MAX {
+    while &*ptr != &last || len >= usize::MAX {
         ptr = ptr.add(1);
         len += 1;
     }
@@ -98,8 +98,8 @@ pub unsafe fn terminated_array_mut<T: PartialEq>(mut ptr: *mut T, last: &T) -> &
 /// let terminated = terminated_slice(&arr, &0);
 /// assert_eq!(terminated, &[1, 2, 3]);
 /// ```
-pub fn terminated_slice<'a, T: PartialEq>(slice: &'a [T], last: &T) -> &'a [T] {
-    if let Some(i) = slice.iter().position(|i| i == last) {
+pub fn terminated_slice<'a, T: PartialEq>(slice: &'a [T], last: T) -> &'a [T] {
+    if let Some(i) = slice.iter().position(|i| i == &last) {
         &slice[..i]
     } else {
         &[]
@@ -118,8 +118,8 @@ pub fn terminated_slice<'a, T: PartialEq>(slice: &'a [T], last: &T) -> &'a [T] {
 /// terminated[1] = 4;
 /// assert_eq!(terminated, &[1, 4, 3]);
 /// ```
-pub fn terminated_slice_mut<'a, T: PartialEq>(slice: &'a mut [T], last: &T) -> &'a mut [T] {
-    if let Some(i) = slice.iter().position(|i| i == last) {
+pub fn terminated_slice_mut<'a, T: PartialEq>(slice: &'a mut [T], last: T) -> &'a mut [T] {
+    if let Some(i) = slice.iter().position(|i| i == &last) {
         &mut slice[..i]
     } else {
         &mut []

@@ -1,5 +1,5 @@
-use windows::Win32::System::Memory::PAGE_PROTECTION_FLAGS;
 use super::Process;
+use windows::Win32::System::Memory::PAGE_PROTECTION_FLAGS;
 
 #[derive(Debug)]
 /// Allocated memory page
@@ -13,7 +13,7 @@ pub struct MemoryRegion {
     /// Protection of the region
     pub protection: PAGE_PROTECTION_FLAGS,
     /// Initial protection of the region
-    pub initial: PAGE_PROTECTION_FLAGS
+    pub initial: PAGE_PROTECTION_FLAGS,
 }
 
 /// Iterator over process's memory regions
@@ -25,10 +25,7 @@ pub struct MemoryRegionIter<'a> {
 impl<'a> MemoryRegionIter<'a> {
     /// Creates new iterator over process's memory regions.
     pub fn new(proc: &'a Process) -> Self {
-        Self {
-            current: 0,
-            proc
-        }
+        Self { current: 0, proc }
     }
 }
 

@@ -209,7 +209,11 @@ impl Pattern {
     /// Finds all pattern occurences in memory range
     /// Panics
     /// if `from` > `to`
-    pub unsafe fn find_all(&self, from: *const u8, to: *const u8) -> impl Iterator<Item = *const u8> + '_ {
+    pub unsafe fn find_all(
+        &self,
+        from: *const u8,
+        to: *const u8,
+    ) -> impl Iterator<Item = *const u8> + '_ {
         assert!(to as usize >= from as usize);
 
         core::slice::from_raw_parts(from, to.offset_from(from) as usize)

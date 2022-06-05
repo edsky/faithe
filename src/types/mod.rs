@@ -2,6 +2,9 @@ cfg_if::cfg_if! {
     if #[cfg(not(feature = "no-std"))] {
         mod winapi;
         pub use winapi::*;
+
+        mod memory;
+        pub use memory::*;
     }
 }
 
@@ -16,6 +19,8 @@ cfg_if::cfg_if! {
 
 mod entry;
 pub use entry::*;
+mod protection;
+pub use protection::*;
 
 /// Zero terminated ascii string. Have the same layout as `*const u8`.
 /// Used for convenience so it can be returned from extern funcs.
@@ -30,7 +35,7 @@ impl StrPtr {
     /// `StrPtr` must point to valid memory.
     #[inline]
     pub unsafe fn to_str<'a>(&self) -> &'a str {
-        core::str::from_utf8_unchecked(crate::terminated_array(self.0.as_ptr(), &0))
+        core::str::from_utf8_unchecked(crate::terminated_array(self.0.as_ptr(), 0))
     }
 
     /// Converts pointer to string by cloning data.
@@ -89,7 +94,7 @@ impl WidePtr {
     /// `WidePtr` must point to valid memory.
     #[inline]
     pub unsafe fn into_string(self) -> alloc::string::String {
-        alloc::string::String::from_utf16_lossy(crate::terminated_array(self.0.as_ptr(), &0))
+        alloc::string::String::from_utf16_lossy(crate::terminated_array(self.0.as_ptr(), 0))
     }
 
     /// Creates new [`WidePtr`] from pointer without checking if it's null.

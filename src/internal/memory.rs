@@ -1,7 +1,4 @@
-use crate::{
-    memory::{MemoryBasicInformation, MemoryProtection},
-    size_of, FaitheError,
-};
+use crate::{size_of, types::MemoryProtection, FaitheError};
 use std::mem::zeroed;
 use windows::Win32::System::Memory::{
     VirtualAlloc, VirtualFree, VirtualQuery, VIRTUAL_ALLOCATION_TYPE, VIRTUAL_FREE_TYPE,
@@ -80,7 +77,7 @@ pub fn free(
 
 /// Queries basic information about memory region at `address`.
 #[cfg(windows)]
-pub fn query(address: usize) -> crate::Result<MemoryBasicInformation> {
+pub fn query(address: usize) -> crate::Result<crate::types::MemoryBasicInformation> {
     unsafe {
         let mut mem_info = zeroed();
         if VirtualQuery(address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {

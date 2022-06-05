@@ -4,11 +4,14 @@ use crate::{
     types::{ListEntry, UnicodeString},
     FaitheError,
 };
-use windows::{Win32::{
-    Foundation::{HANDLE, HWND},
-    System::{Console, Threading, LibraryLoader::GetModuleHandleA},
-    UI::WindowsAndMessaging::{MessageBoxW, MESSAGEBOX_STYLE},
-}, core::PCWSTR};
+use windows::{
+    core::PCWSTR,
+    Win32::{
+        Foundation::{HANDLE, HWND},
+        System::{Console, LibraryLoader::GetModuleHandleA, Threading},
+        UI::WindowsAndMessaging::{MessageBoxW, MESSAGEBOX_STYLE},
+    },
+};
 
 /// Returns a handle to the current process.
 pub const fn get_current_process() -> HANDLE {
