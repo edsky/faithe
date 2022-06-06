@@ -1,11 +1,11 @@
-use super::Process;
+use super::OwnedProcess;
 use windows::Win32::System::Memory::{
     PAGE_EXECUTE, PAGE_EXECUTE_READ, PAGE_EXECUTE_READWRITE, PAGE_EXECUTE_WRITECOPY, PAGE_NOACCESS,
     PAGE_PROTECTION_FLAGS, PAGE_READONLY, PAGE_READWRITE, PAGE_WRITECOPY,
 };
 
 /// Allows to easily query process memory.
-pub struct Query<'a>(pub(crate) &'a Process);
+pub struct Query<'a>(pub(crate) &'a OwnedProcess);
 impl<'a> Query<'a> {
     /// Checks if it's possible to read memory at the address.
     #[inline]

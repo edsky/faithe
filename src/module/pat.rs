@@ -1,13 +1,13 @@
 use super::ModuleEntry;
 use crate::{
     pattern::{Pattern, PatternSearcher},
-    process::Process,
+    process::OwnedProcess,
 };
 use windows::Win32::System::Threading::PROCESS_VM_READ;
 
 /// Iterator over module pattern occurences.
 pub struct ModulePatIter {
-    proc: Process,
+    proc: OwnedProcess,
     pat: Pattern,
     from: usize,
     to: usize,
@@ -16,7 +16,7 @@ pub struct ModulePatIter {
 
 impl ModulePatIter {
     pub(crate) fn new(pid: u32, from: usize, to: usize, pat: Pattern) -> crate::Result<Self> {
-        let proc = Process::open_by_id(pid, false, PROCESS_VM_READ)?;
+        let proc = OwnedProcess::open_by_id(pid, false, PROCESS_VM_READ)?;
 
         Ok(Self {
             proc,

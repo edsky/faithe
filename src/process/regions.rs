@@ -1,4 +1,4 @@
-use super::Process;
+use super::OwnedProcess;
 use windows::Win32::System::Memory::PAGE_PROTECTION_FLAGS;
 
 #[derive(Debug)]
@@ -18,13 +18,13 @@ pub struct MemoryRegion {
 
 /// Iterator over process's memory regions
 pub struct MemoryRegionIter<'a> {
-    proc: &'a Process,
+    proc: &'a OwnedProcess,
     current: usize,
 }
 
 impl<'a> MemoryRegionIter<'a> {
     /// Creates new iterator over process's memory regions.
-    pub fn new(proc: &'a Process) -> Self {
+    pub fn new(proc: &'a OwnedProcess) -> Self {
         Self { current: 0, proc }
     }
 }

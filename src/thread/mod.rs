@@ -2,7 +2,7 @@ use std::mem::zeroed;
 
 use crate::{size_of, FaitheError};
 use windows::Win32::{
-    Foundation::HANDLE,
+    Foundation::{HANDLE, CloseHandle},
     System::{
         Diagnostics::Debug::{GetThreadContext, SetThreadContext},
         Threading::{
@@ -18,9 +18,9 @@ mod iter;
 pub use iter::*;
 
 /// Represents a handle to a thread.
-pub struct Thread(HANDLE);
+pub struct OwnedThread(HANDLE);
 
-impl Thread {
+impl OwnedThread {
     /// Tries to open thread by its id.
     pub fn open(
         thread_id: u32,
@@ -36,8 +36,13 @@ impl Thread {
 
     /// Returns the handle to the thread.
     /// # Safety
-    /// Do not close it until `Thread` is in use.
+    /// Do not close it until [`OwnedThread`] is in use.
     pub unsafe fn handle(&self) -> HANDLE {
+        self.0
+    }
+
+    /// Converts [`OwnedThread`] into inner `HANDLE`.
+    pub fn into_handle(self) -> HANDLE {
         self.0
     }
 
@@ -100,6 +105,14 @@ impl Thread {
             } else {
                 Ok(())
             }
+        }
+    }
+}
+
+impl Drop for OwnedThread {
+    fn drop(&mut self) {
+        unsafe {
+            CloseHandle(self.0);
         }
     }
 }

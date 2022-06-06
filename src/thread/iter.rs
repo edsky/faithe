@@ -8,7 +8,7 @@ use windows::Win32::{
     },
 };
 use crate::{size_of, FaitheError};
-use super::Thread;
+use super::OwnedThread;
 
 /// Represents single running thread in a process.
 #[derive(Debug, Clone)]
@@ -27,8 +27,8 @@ impl ThreadEntry {
         &self,
         inherit_handle: bool,
         desired_access: THREAD_ACCESS_RIGHTS,
-    ) -> crate::Result<Thread> {
-        Thread::open(self.thread_id, inherit_handle, desired_access)
+    ) -> crate::Result<OwnedThread> {
+        OwnedThread::open(self.thread_id, inherit_handle, desired_access)
     }
 }
 

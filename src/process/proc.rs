@@ -26,9 +26,9 @@ use windows::Win32::{
 };
 
 /// Represents a handle to a process.
-pub struct Process(HANDLE);
+pub struct OwnedProcess(HANDLE);
 
-impl Process {
+impl OwnedProcess {
     /// Creates process from handle.
     /// # Safety
     /// Passed handle must never be used/closed after its move.
@@ -111,6 +111,11 @@ impl Process {
     /// # Safety
     /// Do not close it and you will be alright.
     pub unsafe fn handle(&self) -> HANDLE {
+        self.0
+    }
+
+    /// Converts [`OwnedProcess`] into inner `HANDLE`.
+    pub fn into_handle(self) -> HANDLE {
         self.0
     }
 
@@ -425,7 +430,7 @@ impl Process {
     }
 }
 
-impl Drop for Process {
+impl Drop for OwnedProcess {
     fn drop(&mut self) {
         unsafe {
             CloseHandle(self.0);

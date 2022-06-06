@@ -1,4 +1,4 @@
-use super::Process;
+use super::OwnedProcess;
 use crate::{module::ModuleIterator, thread::ThreadIterator, FaitheError};
 use std::mem::size_of;
 use windows::Win32::{
@@ -45,8 +45,8 @@ impl ProcessEntry {
         &self,
         inherit_handle: bool,
         desired_access: PROCESS_ACCESS_RIGHTS,
-    ) -> crate::Result<Process> {
-        Process::open_by_id(self.process_id, inherit_handle, desired_access)
+    ) -> crate::Result<OwnedProcess> {
+        OwnedProcess::open_by_id(self.process_id, inherit_handle, desired_access)
     }
 }
 
