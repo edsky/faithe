@@ -31,6 +31,13 @@ impl Thread {
         }
     }
 
+    /// Returns the handle to the thread.
+    /// # Safety
+    /// Do not close it until `Thread` is in use.
+    pub unsafe fn handle(&self) -> HANDLE {
+        self.0
+    }
+
     /// Tries to suspend the thread.
     /// On success returns the previous suspend count.
     pub fn suspend(&self) -> crate::Result<u32> {
