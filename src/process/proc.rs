@@ -1,9 +1,9 @@
-use super::{MemoryRegion, MemoryRegionIter, ProcessIterator, Query};
+use super::{MemoryRegionIter, ProcessIterator, Query};
 use crate::{
     module::ModuleIterator,
     pattern::{Pattern, PatternSearcher},
     size_of,
-    thread::Threads,
+    thread::ThreadIterator,
     types::{MemoryBasicInformation, MemoryProtection},
     FaitheError,
 };
@@ -73,8 +73,10 @@ impl Process {
     }
 
     /// Returns an iterator over running threads in the process.
-    pub fn threads(&self) -> crate::Result<Threads> {
-        Threads::new(self.id())
+    /// **Note**
+    /// Unlike Windows API, this iterator iterates only over process's threads.
+    pub fn threads(&self) -> crate::Result<ThreadIterator> {
+        ThreadIterator::new(self.id())
     }
 
     /// Returns process's id.
@@ -101,7 +103,7 @@ impl Process {
 
     // @TODO: Fix iterator sometimes missing some memory regions??
     /// Returns an itertor over process's allocated memory pages
-    pub fn regions(&self) -> impl Iterator<Item = MemoryRegion> + '_ {
+    pub fn regions(&self) -> MemoryRegionIter {
         MemoryRegionIter::new(self)
     }
 

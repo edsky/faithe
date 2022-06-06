@@ -1,5 +1,5 @@
 use super::Process;
-use crate::{module::ModuleIterator, thread::Threads, FaitheError};
+use crate::{module::ModuleIterator, thread::ThreadIterator, FaitheError};
 use std::mem::size_of;
 use windows::Win32::{
     Foundation::HANDLE,
@@ -34,8 +34,8 @@ impl ProcessEntry {
     }
 
     /// Returns an iterator over running threads in the process.
-    pub fn threads(&self) -> crate::Result<Threads> {
-        Threads::new(self.process_id)
+    pub fn threads(&self) -> crate::Result<ThreadIterator> {
+        ThreadIterator::new(self.process_id)
     }
 }
 

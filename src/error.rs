@@ -5,6 +5,9 @@ pub enum FaitheError {
     #[cfg(not(feature = "no-std"))]
     /// Error code returned from `GetLastError()` WinAPI.
     ErrorCode(windows::Win32::Foundation::WIN32_ERROR),
+    #[cfg(not(feature = "no-std"))]
+    /// Error from `windows` crate
+    WindowsError(windows::core::Error),
     /// No process with selected name were found.
     ProcessNotFound,
     /// No module with selected name were found.
@@ -37,6 +40,12 @@ cfg_if::cfg_if! {
         impl std::fmt::Display for FaitheError {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{:?}", self)
+            }
+        }
+
+        impl From<windows::core::Error> for FaitheError {
+            fn from(e: windows::core::Error) -> Self {
+                Self::WindowsError(e)
             }
         }
 

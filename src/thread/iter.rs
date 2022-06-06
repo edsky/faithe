@@ -1,10 +1,14 @@
-use crate::{size_of, FaitheError};
 use windows::Win32::{
     Foundation::HANDLE,
-    System::Diagnostics::ToolHelp::{
-        CreateToolhelp32Snapshot, Thread32First, Thread32Next, TH32CS_SNAPTHREAD, THREADENTRY32,
+    System::{
+        Diagnostics::ToolHelp::{
+            CreateToolhelp32Snapshot, Thread32First, Thread32Next, TH32CS_SNAPTHREAD, THREADENTRY32,
+        },
+        Threading::THREAD_ACCESS_RIGHTS,
     },
 };
+use crate::{size_of, FaitheError};
+use super::Thread;
 
 /// Represents single running thread in a process.
 #[derive(Debug, Clone)]
@@ -15,6 +19,17 @@ pub struct ThreadEntry {
     pub thread_id: u32,
     /// Priority of the thread.
     pub base_priority: i32,
+}
+
+impl ThreadEntry {
+    /// Opens thread
+    pub fn open(
+        &self,
+        inherit_handle: bool,
+        desired_access: THREAD_ACCESS_RIGHTS,
+    ) -> crate::Result<Thread> {
+        Thread::open(self.thread_id, inherit_handle, desired_access)
+    }
 }
 
 impl From<THREADENTRY32> for ThreadEntry {
@@ -28,30 +43,33 @@ impl From<THREADENTRY32> for ThreadEntry {
 }
 
 /// Iterator over running threads in the process.
-pub struct Threads {
-    snap: HANDLE,
+pub struct ThreadIterator {
+    snapshot: HANDLE,
     entry: THREADENTRY32,
-    ret: bool,
+    process_id: u32,
+    should_return: bool,
 }
 
-impl Threads {
+impl ThreadIterator {
     /// Creates new iterator over threads in process with id `process_id`.
     pub fn new(process_id: u32) -> crate::Result<Self> {
         unsafe {
-            let snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id)
+            let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, process_id)
                 .map_err(|_| FaitheError::last_error())?;
+
             let entry = THREADENTRY32 {
                 dwSize: size_of!(THREADENTRY32) as _,
                 ..Default::default()
             };
 
             let mut this = Self {
-                snap,
+                should_return: false,
+                process_id,
+                snapshot,
                 entry,
-                ret: true,
             };
 
-            if Thread32First(snap, &mut this.entry) == false {
+            if Thread32First(snapshot, &mut this.entry) == false {
                 Err(FaitheError::last_error())
             } else {
                 Ok(this)
@@ -60,17 +78,25 @@ impl Threads {
     }
 }
 
-impl Iterator for Threads {
+impl Iterator for ThreadIterator {
     type Item = ThreadEntry;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if !self.ret {
+        if self.should_return {
             None
         } else {
-            let this = self.entry.into();
+            let mut this: ThreadEntry = self.entry.into();
 
             unsafe {
-                self.ret = Thread32Next(self.snap, &mut self.entry) == true;
+                self.should_return = Thread32Next(self.snapshot, &mut self.entry) == false;
+
+                while this.process_id != self.process_id {
+                    this = self.entry.into();
+                    self.should_return = Thread32Next(self.snapshot, &mut self.entry) == false;
+                    if self.should_return {
+                        return None;
+                    }
+                }
             }
 
             Some(this)

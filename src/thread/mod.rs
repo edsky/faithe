@@ -1,11 +1,14 @@
 use std::mem::zeroed;
 
-use crate::FaitheError;
+use crate::{size_of, FaitheError};
 use windows::Win32::{
     Foundation::HANDLE,
     System::{
         Diagnostics::Debug::{GetThreadContext, SetThreadContext},
-        Threading::{OpenThread, ResumeThread, SuspendThread, THREAD_ACCESS_RIGHTS},
+        Threading::{
+            NtQueryInformationThread, OpenThread, ResumeThread, SuspendThread, THREADINFOCLASS,
+            THREAD_ACCESS_RIGHTS,
+        },
     },
 };
 
@@ -36,6 +39,21 @@ impl Thread {
     /// Do not close it until `Thread` is in use.
     pub unsafe fn handle(&self) -> HANDLE {
         self.0
+    }
+
+    /// Returns the start address of the thread
+    pub fn start_address(&self) -> crate::Result<usize> {
+        let mut addr = 0;
+        unsafe {
+            NtQueryInformationThread(
+                self.0,
+                THREADINFOCLASS(9), // ThreadQuerySetWin32StartAddress
+                &mut addr as *mut _ as _,
+                size_of!(usize) as _,
+                0 as _,
+            )?;
+        }
+        Ok(addr)
     }
 
     /// Tries to suspend the thread.
