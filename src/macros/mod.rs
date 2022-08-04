@@ -3,6 +3,7 @@ mod interface;
 mod sizeof;
 mod strings;
 mod vmt;
+mod parent;
 
 cfg_if::cfg_if! {
     if #[cfg(not(feature = "no-std"))] {

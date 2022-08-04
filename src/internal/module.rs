@@ -97,6 +97,8 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
     use super::get_peb;
     use crate::{containing_record, internal::LdrDataTableEntry};
 
+    let mod_name = mod_name.as_ref().to_lowercase();
+
     unsafe {
         let first = containing_record!(
             get_peb().ldr_data.in_memory_order_links,
@@ -105,8 +107,8 @@ pub fn get_module_information(mod_name: impl AsRef<str>) -> crate::Result<Module
         );
         let mut current = first;
         loop {
-            if let Some(s) = (*current).base_dll_name.decode_utf16() {
-                if s == mod_name.as_ref() {
+            if let Some(s) = (*current).base_dll_name.decode_utf16().map(|s| s.to_lowercase()) {
+                if mod_name == s {
                     break Ok(ModuleInfo {
                         dll_base: (*current).dll_base,
                         image_size: (*current).image_size as _,
