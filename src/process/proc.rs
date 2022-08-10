@@ -116,7 +116,9 @@ impl OwnedProcess {
 
     /// Converts [`OwnedProcess`] into inner `HANDLE`.
     pub fn into_handle(self) -> HANDLE {
-        self.0
+        let handle = self.0;
+        core::mem::forget(self);
+        handle
     }
 
     /// Gets module that contains selected address

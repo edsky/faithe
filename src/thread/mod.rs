@@ -43,7 +43,9 @@ impl OwnedThread {
 
     /// Converts [`OwnedThread`] into inner `HANDLE`.
     pub fn into_handle(self) -> HANDLE {
-        self.0
+        let handle = self.0;
+        core::mem::forget(self);
+        handle
     }
 
     /// Returns the start address of the thread
