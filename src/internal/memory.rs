@@ -40,7 +40,7 @@ pub fn allocate(
 ) -> crate::Result<*mut ()> {
     unsafe {
         let region = VirtualAlloc(
-            address as _,
+            Some(address as _),
             size,
             allocation_type,
             protection.to_os()
@@ -80,7 +80,7 @@ pub fn free(
 pub fn query(address: usize) -> crate::Result<crate::types::MemoryBasicInformation> {
     unsafe {
         let mut mem_info = zeroed();
-        if VirtualQuery(address as _, &mut mem_info, size_of!(@ mem_info)) == 0 {
+        if VirtualQuery(Some(address as _), &mut mem_info, size_of!(@ mem_info)) == 0 {
             Err(FaitheError::last_error())
         } else {
             Ok(mem_info.into())
